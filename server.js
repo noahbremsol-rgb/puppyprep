@@ -79,18 +79,30 @@ STORAGE & SAFETY TIPS:
 IMPORTANT NOTES:
 [Any special considerations for this dog's breed, age, or health goal]`;
 
-  const message = await client.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 2000,
-    messages: [
-      {
-        role: 'user',
-        content: prompt
-      }
-    ]
-  });
+  try {
+    console.log('Calling Claude API...');
+    const message = await Promise.race([
+      client.messages.create({
+        model: 'claude-opus-4-6',
+        max_tokens: 2000,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Claude API timeout after 30 seconds')), 30000)
+      )
+    ]);
 
-  return message.content[0].text;
+    console.log('Claude API response received');
+    return message.content[0].text;
+  } catch (error) {
+    console.error('Claude API error:', error.message);
+    throw error;
+  }
 }
 
 // Generate PDF from meal plan
