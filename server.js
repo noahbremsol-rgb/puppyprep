@@ -93,7 +93,7 @@ IMPORTANT NOTES:
         ]
       }),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Claude API timeout after 30 seconds')), 30000)
+        setTimeout(() => reject(new Error('Claude API timeout after 60 seconds')), 60000)
       )
     ]);
 
