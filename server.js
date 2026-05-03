@@ -2,12 +2,16 @@ const express = require('express');
 const { Anthropic } = require('@anthropic-ai/sdk');
 const PDFDocument = require('pdfkit');
 const cors = require('cors');
+const Stripe = require('stripe');
+const { Resend } = require('resend');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 const client = new Anthropic();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Generate meal plan using Claude
 async function generateMealPlan(quizData) {
@@ -133,7 +137,7 @@ function generatePDF(mealPlanText, quizData) {
     });
 
     doc.moveDown();
-    doc.fontSize(9).fillColor('#A08E7A').text('Generated with ❤️ by Puppy Plans', { align: 'center' });
+    doc.fontSize(9).fillColor('#A08E7A').text('Generated with ❤️ by Tail Prep', { align: 'center' });
 
     doc.end();
   });
@@ -164,6 +168,103 @@ app.post('/api/generate-plan', async (req, res) => {
 
   } catch (error) {
     console.error('Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Stripe session email
+app.get('/api/session-email', async (req, res) => {
+  try {
+    const sessionId = req.query.session_id;
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Missing session_id' });
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    res.json({
+      email: session.customer_details?.email || '',
+      paymentStatus: session.payment_status
+    });
+  } catch (error) {
+    console.error('Error retrieving session:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Finalize purchase: Generate full plan, create PDF, send email
+app.post('/api/finalize-purchase', async (req, res) => {
+  try {
+    const { sessionId, email, quizData } = req.body;
+
+    if (!sessionId || !email || !quizData) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Verify Stripe session payment
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (session.payment_status !== 'paid') {
+      return res.status(400).json({ error: 'Payment not confirmed' });
+    }
+
+    console.log(`Finalizing purchase for ${quizData.name}, sending to ${email}`);
+
+    // Generate full meal plan
+    const mealPlan = await generateMealPlan(quizData);
+
+    // Generate PDF
+    const pdfBuffer = await generatePDF(mealPlan, quizData);
+
+    // Send email with PDF
+    const emailResponse = await resend.emails.send({
+      from: 'Tail Prep <onboarding@resend.dev>', // Update this email
+      to: email,
+      subject: `${quizData.name}'s Personalized 1-Week Meal Plan`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1>🐕 ${quizData.name}'s Meal Plan is Ready!</h1>
+          <p>Hi there!</p>
+          <p>Your personalized 1-week meal prep plan for <strong>${quizData.name}</strong> is attached as a PDF.</p>
+          <p><strong>Plan Summary:</strong></p>
+          <ul>
+            <li>Breed: ${quizData.breed}</li>
+            <li>Size: ${quizData.size}</li>
+            <li>Activity Level: ${quizData.activity}</li>
+            <li>Health Goal: ${quizData.goal}</li>
+          </ul>
+          <p>Open the PDF to see the complete 7-day meal schedule, shopping list, prep instructions, and more!</p>
+          <p>Happy meal prepping! 🐾</p>
+          <p>- Tail Prep Team</p>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: `${quizData.name}-Meal-Plan.pdf`,
+          content: pdfBuffer.toString('base64')
+        }
+      ]
+    });
+
+    if (!emailResponse.data?.id) {
+      console.error('Email send failed:', emailResponse);
+      return res.status(500).json({ error: 'Failed to send email' });
+    }
+
+    console.log('Email sent successfully:', emailResponse.data.id);
+
+    // Return full plan for display on page
+    res.json({
+      success: true,
+      mealPlan: mealPlan,
+      message: `Meal plan emailed to ${email}!`
+    });
+
+  } catch (error) {
+    console.error('Error in finalize-purchase:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
