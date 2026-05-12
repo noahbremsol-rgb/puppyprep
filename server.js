@@ -32,18 +32,28 @@ DOG INFORMATION:
 Create a personalized 1-week meal prep plan. Format your response EXACTLY like this:
 
 SUMMARY
-[Write 3-4 sentences explaining why this plan is tailored for this dog based on breed, age, size, activity level, and goals]
+[Write 3-4 sentences explaining why this plan is tailored for ${quizData.name} (${quizData.gender || 'gender not specified'}, ${quizData.weight || 'weight not specified'} lbs) based on breed, age, size, activity level, and goals]
 
 DAILY CALORIC NEEDS
 [Calculate approximate daily calories needed based on size and activity]
 
+WEEKLY SHOPPING LIST
+[Organized list with quantities needed for the week - include all ingredients across all 7 days]
+
 1-WEEK MEAL PREP PLAN FOR ${quizData.name.toUpperCase()}
 
 MONDAY:
-Protein: [amount and type]
-Carbs: [amount and type]
-Vegetables: [specific vegetables with amounts]
-Supplements: [any supplements]
+Ingredients:
+1. [Ingredient with amount]
+2. [Ingredient with amount]
+3. [Ingredient with amount]
+4. [Ingredient with amount]
+
+Steps:
+1. [Preparation step]
+2. [Preparation step]
+3. [Preparation step]
+4. [Preparation step]
 
 TUESDAY:
 [same format]
@@ -61,21 +71,11 @@ SATURDAY:
 [same format]
 
 SUNDAY (TREAT DAY):
-[Include something special but still healthy]
-
-WEEKLY SHOPPING LIST:
-[Organized list with quantities needed for the week]
+[same format - include something special but still healthy]
 
 DAILY PORTIONS FOR ${quizData.name.toUpperCase()}:
 Morning: [Specific breakdown with portions]
 Evening: [Specific breakdown with portions]
-
-PREP DAY INSTRUCTIONS:
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
-4. [Step 4]
-5. [Step 5]
 
 STORAGE & SAFETY TIPS:
 [3-4 tips specific to their situation]
@@ -169,6 +169,7 @@ app.post('/api/generate-plan', async (req, res) => {
     // Send PDF
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${quizData.name}-Meal-Plan.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
     res.send(pdfBuffer);
 
   } catch (error) {
