@@ -172,6 +172,38 @@ app.post('/api/generate-plan', async (req, res) => {
   }
 });
 
+// Create checkout session
+app.post('/api/create-checkout', async (req, res) => {
+  try {
+    const { dogName } = req.body;
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Tail Prep - 1-Week Dog Meal Plan',
+              description: `Personalized meal plan for ${dogName || 'your dog'}`
+            },
+          },
+          unit_amount: 500, // $5.00
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'https://tailprep.netlify.app/?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://tailprep.netlify.app/',
+    });
+
+    res.json({ url: session.url, sessionId: session.id });
+  } catch (error) {
+    console.error('Checkout creation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get Stripe session email
 app.get('/api/session-email', async (req, res) => {
   try {
