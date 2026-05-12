@@ -187,8 +187,8 @@ app.post('/api/create-checkout', async (req, res) => {
               name: 'Tail Prep - 1-Week Dog Meal Plan',
               description: `Personalized meal plan for ${dogName || 'your dog'}`
             },
+            unit_amount: 500, // $5.00
           },
-          unit_amount: 500, // $5.00
           quantity: 1,
         },
       ],
