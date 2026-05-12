@@ -85,6 +85,9 @@ IMPORTANT NOTES:
 
   try {
     console.log('Calling Claude API...');
+    console.log('API key present:', !!process.env.ANTHROPIC_API_KEY);
+    console.log('API key preview:', process.env.ANTHROPIC_API_KEY?.substring(0, 10) || 'MISSING');
+
     const message = await Promise.race([
       client.messages.create({
         model: 'claude-opus-4-6',
@@ -104,7 +107,9 @@ IMPORTANT NOTES:
     console.log('Claude API response received');
     return message.content[0].text;
   } catch (error) {
-    console.error('Claude API error:', error.message);
+    console.error('Claude API error:', error);
+    console.error('Error message:', error.message);
+    console.error('Error status:', error.status);
     throw error;
   }
 }
