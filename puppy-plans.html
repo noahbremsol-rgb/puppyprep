@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tail Prep - AI Dog Meal Prep</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Outfit:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #e8d4c0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #5a4a42;
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            color: #8C7A68;
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #5a4a42;
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.3px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0d5ca;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+            background-color: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #8C7A68;
+            background-color: #fafaf8;
+            box-shadow: 0 4px 12px rgba(140, 122, 104, 0.1);
+        }
+
+        input.error, select.error {
+            border-color: #d9534f;
+            background-color: #fff5f5;
+        }
+
+        .error-message {
+            color: #d9534f;
+            font-size: 13px;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .breed-search-container {
+            position: relative;
+        }
+
+        .breed-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #8C7A68;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding-top: 0;
+        }
+
+        .breed-dropdown.active {
+            display: block;
+        }
+
+        .breed-search-frozen {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 10px 15px;
+            border-bottom: 2px solid #e0d5ca;
+            z-index: 10;
+        }
+
+        .breed-search-frozen input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0d5ca;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .breed-search-frozen input:focus {
+            outline: none;
+            border-color: #8C7A68;
+            background-color: #fafaf8;
+        }
+
+        .breed-category-title {
+            padding: 12px 15px 5px 15px;
+            color: #8C7A68;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #fafaf8;
+        }
+
+        .breed-option {
+            padding: 12px 15px;
+            cursor: pointer;
+            color: #5a4a42;
+            transition: background-color 0.2s;
+        }
+
+        .breed-option:hover {
+            background-color: #f0e8e0;
+        }
+
+        .breed-option.selected {
+            background-color: #e0d5ca;
+            font-weight: 600;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e0d5ca;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4a574 0%, #8C7A68 100%);
+            width: 20%;
+            transition: width 0.4s ease;
+            border-radius: 3px;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0d5ca;
+            z-index: 0;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #e0d5ca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8C7A68;
+            font-weight: 600;
+            z-index: 1;
+            position: relative;
+        }
+
+        .step.active {
+            background: #8C7A68;
+            color: white;
+            border-color: #8C7A68;
+        }
+
+        .step.completed {
+            background: #d4a574;
+            border-color: #d4a574;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8C7A68 0%, #6d5e56 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(140, 122, 104, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(140, 122, 104, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0e8e0;
+            color: #8C7A68;
+            border: 2px solid #e0d5ca;
+        }
+
+        .btn-secondary:hover {
+            background: #e0d5ca;
+            border-color: #8C7A68;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading-screen {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .spinner {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .rotating-bone {
+            width: 100%;
+            height: 100%;
+            animation: rotateBone 2s linear infinite;
+            font-size: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes rotateBone {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar-container {
+            width: 200px;
+            height: 8px;
+            background: #e0d5ca;
+            border-radius: 10px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8C7A68 0%, #d4a574 100%);
+            border-radius: 10px;
+            animation: fillProgress 20s ease-out forwards;
+        }
+
+        @keyframes fillProgress {
+            0% { width: 0%; }
+            100% { width: 85%; }
+        }
+
+        .loading-text {
+            color: #5a4a42;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .loading-pun {
+            color: #8C7A68;
+            font-size: 15px;
+            font-style: italic;
+            height: 20px;
+            min-height: 20px;
+            animation: fadeInOut 4s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #635bff;
+            animation: confetti-fall 3s ease-in forwards;
+        }
+
+        .confetti:nth-child(1) { --delay: 0s; left: 10%; background: #d4a574; }
+        .confetti:nth-child(2) { --delay: 0.1s; left: 20%; background: #8C7A68; }
+        .confetti:nth-child(3) { --delay: 0.2s; left: 30%; background: #635bff; }
+        .confetti:nth-child(4) { --delay: 0.3s; left: 40%; background: #d4a574; }
+        .confetti:nth-child(5) { --delay: 0.4s; left: 50%; background: #8C7A68; }
+        .confetti:nth-child(6) { --delay: 0.5s; left: 60%; background: #635bff; }
+        .confetti:nth-child(7) { --delay: 0.6s; left: 70%; background: #d4a574; }
+        .confetti:nth-child(8) { --delay: 0.7s; left: 80%; background: #8C7A68; }
+        .confetti:nth-child(9) { --delay: 0.8s; left: 90%; background: #635bff; }
+
+        @keyframes confetti-fall {
+            0% {
+                top: -10px;
+                opacity: 1;
+                transform: translateX(0) rotate(0deg);
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+                transform: translateX(100px) rotate(720deg);
+            }
+        }
+
+        .success-pulse {
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .results-section {
+            display: block;
+        }
+
+        .results-section.hidden {
+            display: none;
+        }
+
+        .plan-content {
+            margin: 20px 0;
+        }
+
+        .download-button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .price-display {
+            background: #e8d4c0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .price {
+            font-size: 36px;
+            font-weight: 700;
+            color: #5a4a42;
+        }
+
+        .price-label {
+            color: #8C7A68;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .section-title {
+            color: #5a4a42;
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtitle {
+            color: #8C7A68;
+            font-size: 15px;
+            font-style: italic;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .dog-name-display {
+            color: #5a4a42;
+            font-weight: 700;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .plan-section {
+            margin: 25px 0;
+            border-left: 4px solid #d4a574;
+            padding-left: 20px;
+        }
+
+        .plan-section-title {
+            color: #5a4a42;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .plan-section-title:hover {
+            color: #8C7A68;
+        }
+
+        .plan-section-content {
+            color: #5a4a42;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-left: 0;
+            display: block;
+        }
+
+        .plan-section-content.collapsed {
+            display: none;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+
+        .expand-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .highlight-box {
+            background: #f9f7f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .stripe-button {
+            background: #635bff;
+            color: white;
+            padding: 16px 32px;
+            font-size: 18px;
+        }
+
+        .stripe-button:hover {
+            background: #5451d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(99, 91, 255, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            h2, .section-title {
+                font-size: 22px !important;
+            }
+
+            .logo {
+                font-size: 36px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            button {
+                padding: 16px 24px !important;
+                font-size: 17px !important;
+            }
+
+            .form-group {
+                margin-bottom: 30px;
+            }
+
+            input, select {
+                padding: 16px 14px !important;
+                font-size: 17px !important;
+                border-radius: 12px;
+            }
+
+            label {
+                font-size: 18px !important;
+            }
+
+            .step-indicator {
+                margin-bottom: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🐕</div>
+            <h1>Tail Prep</h1>
+            <p class="tagline">Personalized Dog Meal Plans</p>
+        </header>
+
+        <div class="card" id="quizCard">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+                <div class="step" id="step4">4</div>
+                <div class="step" id="step5">5</div>
+            </div>
+
+            <!-- Step 1: Dog Name & Breed -->
+            <div class="quiz-step" id="step-1">
+                <h2 class="section-title">Tell Us About Your Pup 🐾</h2>
+                <p class="section-subtitle">Let's get to know your furry friend—no ruff experience necessary!</p>
+
+                <div class="form-group">
+                    <label for="dogName">What's Your Dog's Name?</label>
+                    <input type="text" id="dogName" placeholder="e.g., Max, Luna, Buddy" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dogBreed">Breed</label>
+                    <div class="breed-search-container">
+                        <input type="text" id="dogBreed" placeholder="Search for breed..." required>
+                        <div class="breed-dropdown" id="breedDropdown"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dogGender">Gender</label>
+                    <select id="dogGender" required>
+                        <option value="">Select gender...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="nextStep(1)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Size & Activity -->
+            <div class="quiz-step hidden" id="step-2">
+                <h2 class="section-title">Size & Activity 💪</h2>
+                <p class="section-subtitle">Is your pup a couch potato or a furry athlete? Either way, we've got the perfect meal plan!</p>
+
+                <div class="form-group">
+                    <label for="dogSize">Dog Size</label>
+                    <select id="dogSize" required>
+                        <option value="">Select size...</option>
+                        <option value="Small (Under 20 lbs)">Small (Under 20 lbs)</option>
+                        <option value="Medium (20-50 lbs)">Medium (20-50 lbs)</option>
+                        <option value="Large (50-100 lbs)">Large (50-100 lbs)</option>
+                        <option value="Extra Large (Over 100 lbs)">Extra Large (Over 100 lbs)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dogWeight">Weight (lbs)</label>
+                    <input type="number" id="dogWeight" placeholder="Optional" min="1" max="200">
+                </div>
+
+                <div class="form-group">
+                    <label for="activity">Activity Level</label>
+                    <select id="activity" required>
+                        <option value="">Select activity level...</option>
+                        <option value="Couch Potato">Couch Potato (Low Activity)</option>
+                        <option value="Moderate">Moderate (Regular Walks)</option>
+                        <option value="Active">Active (Daily Exercise)</option>
+                        <option value="Very Active">Very Active (Agility/Sports)</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="prevStep(2)">Back</button>
+                    <button class="btn-primary" onclick="nextStep(2)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Health Goals -->
+            <div class="quiz-step hidden" id="step-3">
+                <h2 class="section-title">Health & Wellness 🏥</h2>
+                <p class="section-subtitle">Every pup deserves the paw-fect nutrition to thrive! Tell us their health goals.</p>
+
+                <div class="form-group">
+                    <label for="goal">Health Goal</label>
+                    <select id="goal" required>
+                        <option value="">Select primary goal...</option>
+                        <option value="Weight Loss">Weight Loss & Fitness</option>
+                        <option value="Muscle Gain">Muscle Building</option>
+                        <option value="Balanced">Balanced Nutrition</option>
+                        <option value="Senior Care">Senior Care</option>
+                        <option value="Allergy Management">Allergy Management</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="allergies">Allergies or Dietary Restrictions</label>
+                    <select id="allergies" required>
+                        <option value="None">None</option>
+                        <option value="Chicken Allergy">Chicken Allergy</option>
+                        <option value="Beef Allergy">Beef Allergy</option>
+                        <option value="Fish Allergy">Fish Allergy</option>
+                        <option value="Grain-Free">Grain-Free Diet</option>
+                        <option value="Gluten Sensitivity">Gluten Sensitivity</option>
+                        <option value="Dairy Free">Dairy Free</option>
+                        <option value="Multiple Allergies">Multiple Allergies</option>
+                        <option value="Other">Other (Please Specify)</option>
+                    </select>
+                    <input type="text" id="allergiesOther" placeholder="Please specify..." style="display: none; margin-top: 10px;">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="prevStep(3)">Back</button>
+                    <button class="btn-primary" onclick="nextStep(3)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Preferences -->
+            <div class="quiz-step hidden" id="step-4">
+                <h2 class="section-title">Protein & Budget 💰</h2>
+                <p class="section-subtitle">Tail-ored to their taste and your budget—because great nutrition doesn't have to break the bank!</p>
+
+                <div class="form-group">
+                    <label for="protein">Preferred Protein</label>
+                    <select id="protein" required>
+                        <option value="">Select preferred protein...</option>
+                        <option value="Chicken">Chicken</option>
+                        <option value="Beef">Beef</option>
+                        <option value="Fish">Fish</option>
+                        <option value="Turkey">Turkey</option>
+                        <option value="Mixed">Mixed/No Preference</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="budget">Weekly Budget</label>
+                    <select id="budget" required>
+                        <option value="">Select budget range...</option>
+                        <option value="Budget-Friendly ($20-40/week)">Budget-Friendly ($20-40/week)</option>
+                        <option value="Standard ($40-70/week)">Standard ($40-70/week)</option>
+                        <option value="Premium ($70-100/week)">Premium ($70-100/week)</option>
+                        <option value="No Limit">Premium+ (No Limit)</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="prevStep(4)">Back</button>
+                    <button class="btn-primary" onclick="nextStep(4)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Review -->
+            <div class="quiz-step hidden" id="step-5">
+                <h2 class="section-title">Review Your Answers ✓</h2>
+                <p class="section-subtitle">Almost there! Let's make sure everything looks paws-itively perfect before we cook up their plan.</p>
+
+                <div style="background: #f9f7f5; padding: 20px; border-radius: 8px; margin: 20px 0; color: #5a4a42;">
+                    <p><strong>Name:</strong> <span id="review-name"></span></p>
+                    <p><strong>Breed:</strong> <span id="review-breed"></span></p>
+                    <p><strong>Gender:</strong> <span id="review-gender"></span></p>
+                    <p><strong>Size:</strong> <span id="review-size"></span></p>
+                    <p><strong>Activity Level:</strong> <span id="review-activity"></span></p>
+                    <p><strong>Health Goal:</strong> <span id="review-goal"></span></p>
+                    <p><strong>Allergies:</strong> <span id="review-allergies"></span></p>
+                    <p><strong>Protein:</strong> <span id="review-protein"></span></p>
+                    <p><strong>Budget:</strong> <span id="review-budget"></span></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="prevStep(5)">Back</button>
+                    <button class="btn-primary" id="generateBtn" onclick="generatePlan()">Generate My Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div class="card hidden" id="loadingCard">
+            <div class="loading-screen">
+                <div class="spinner">
+                    <div class="rotating-bone">🦴</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                <div class="loading-text" id="loadingText">Preparing Your Meal Plan...</div>
+                <div class="loading-pun" id="loadingPun"></div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="card hidden" id="resultsCard">
+            <div class="results-section">
+                <div class="dog-name-display" id="resultDogName"></div>
+                <div class="plan-content" id="planContent"></div>
+            </div>
+        </div>
+
+        <!-- Email Confirmation Screen -->
+        <div class="card hidden" id="emailConfirmCard">
+            <!-- Initial Form State -->
+            <div style="text-align: center; padding: 40px 20px;" id="emailFormState">
+                <div style="font-size: 36px; margin-bottom: 20px;">📧</div>
+                <h2 class="section-title">Confirm Your Email</h2>
+                <p style="color: #8C7A68; margin: 20px 0;">We'll send your meal plan PDF to this email address.</p>
+
+                <div class="form-group" style="margin: 30px 0;">
+                    <label for="confirmEmail">Email Address</label>
+                    <input type="email" id="confirmEmail" placeholder="your@email.com" required>
+                </div>
+
+                <div class="button-group" style="margin-top: 30px;">
+                    <button class="btn-secondary" onclick="cancelPayment()">Go Back</button>
+                    <button class="btn-primary" onclick="finalizePurchase()" id="finalizeBtn">Generate & Send Plan</button>
+                </div>
+                <p style="color: #8C7A68; font-size: 13px; margin-top: 20px;">This will generate your full meal plan and send it to your email (may take 30-60 seconds).</p>
+            </div>
+
+            <!-- Success State -->
+            <div style="text-align: center; padding: 60px 20px; display: none;" id="emailSuccessState">
+                <div style="font-size: 60px; margin-bottom: 20px; animation: bounce 0.6s ease-out;">🎉</div>
+                <h2 class="section-title" style="color: #635bff;">Payment Successful!</h2>
+                <p style="color: #8C7A68; margin: 20px 0; font-size: 16px;">Your personalized meal plan is being generated.</p>
+                <p style="color: #5a4a42; margin: 15px 0; font-size: 14px;">We're tailoring the perfect nutrition plan for your pup...</p>
+                <p style="color: #8C7A68; margin-top: 25px; font-size: 13px; font-weight: 500;">Check your email soon! 📬</p>
+            </div>
+        </div>
+
+        <!-- Full Plan Display -->
+        <div class="card hidden" id="fullPlanCard">
+            <div style="padding: 0;">
+                <div style="background: linear-gradient(135deg, #635bff 0%, #8C7A68 100%); text-align: center; padding: 50px 30px; border-bottom: none;">
+                    <div style="font-size: 56px; margin-bottom: 20px; animation: successPulse 0.8s ease-out;">🎁</div>
+                    <h2 style="color: white; font-size: 32px; font-weight: 700; margin: 0 0 10px 0;">Your Personalized Meal Plan</h2>
+                    <p style="color: rgba(255,255,255,0.9); margin: 12px 0; font-size: 16px;" id="emailConfirmMsg"></p>
+                    <p style="color: rgba(255,255,255,0.8); margin-top: 15px; font-size: 13px; letter-spacing: 0.5px; font-weight: 500;">Powered by Tail Prep 🐾</p>
+                </div>
+
+                <div id="fullPlanContent" style="padding: 40px; max-height: 70vh; overflow-y: auto; color: #5a4a42; line-height: 1.8; font-size: 15px;"></div>
+
+                <div class="button-group" style="padding: 30px; border-top: 2px solid #e0d5ca;">
+                    <button class="btn-secondary" onclick="location.href='/'">Create Another Plan</button>
+                    <button class="btn-primary stripe-button" onclick="downloadPlanPDF()" style="font-size: 16px;">📥 Download as PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Finalizing Purchase Loading -->
+        <div class="card hidden" id="finalizingCard">
+            <div class="loading-screen">
+                <div class="spinner">
+                    <div class="rotating-bone">🦴</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                <div class="loading-text" id="loadingText">Generating Your Full Meal Plan...</div>
+                <div class="loading-pun" id="loadingPun"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const popularBreeds = [
+            'Labrador Retriever', 'French Bulldog', 'Golden Retriever', 'German Shepherd',
+            'Bulldog', 'Poodle', 'Beagle', 'Yorkshire Terrier', 'Dachshund', 'Corgi'
+        ];
+
+        const breedEmojis = {
+            'Labrador': '🐕', 'Labrador Retriever': '🐕', 'French Bulldog': '🐾', 'Golden Retriever': '🐕',
+            'German Shepherd': '🐕', 'Bulldog': '🐾', 'Poodle': '🐩', 'Beagle': '🐶',
+            'Yorkshire Terrier': '🐕', 'Dachshund': '🐕', 'Corgi': '🐕', 'Chihuahua': '🐶',
+            'Pug': '🐾', 'Husky': '🐕', 'Shepherd': '🐕', 'Terrier': '🐕', 'Retriever': '🐕',
+            'Spaniel': '🐕', 'Setter': '🐕', 'Pointer': '🐕', 'Hound': '🐕', 'Mastiff': '🐕',
+            'Boxer': '🐕', 'Pit Bull': '🐕', 'Rottweiler': '🐕', 'Doberman': '🐕', 'Afghan': '🐩',
+            'Pomeranian': '🐩', 'Maltese': '🐩', 'Shih Tzu': '🐩', 'Schnauzer': '🐩', 'Wire Hair': '🐩'
+        };
+
+        function getBreedEmoji(breed) {
+            for (const [key, emoji] of Object.entries(breedEmojis)) {
+                if (breed.toLowerCase().includes(key.toLowerCase())) {
+                    return emoji;
+                }
+            }
+            return '🐕';
+        }
+
+        const allBreeds = [
+            'Affenpinscher', 'Afghan Hound', 'Airedale Terrier', 'Akita', 'Alaskan Malamute',
+            'American Cocker Spaniel', 'American Eskimo Dog', 'American Foxhound', 'American Staffordshire Terrier', 'American Water Spaniel',
+            'Anatolian Shepherd Dog', 'Appenzeller Sennenhund', 'Australian Cattle Dog', 'Australian Shepherd', 'Australian Terrier',
+            'Austrian Pinscher', 'Basenji', 'Basset Hound', 'Beagle', 'Bearded Collie', 'Beauceron', 'Bedlington Terrier', 'Belgian Malinois', 'Belgian Sheepdog', 'Belgian Tervuren',
+            'Bernese Mountain Dog', 'Bichon Frise', 'Biewer Terrier', 'Black Russian Terrier', 'Bloodhound', 'Blow Gun Dog', 'Boerboel', 'Bohemian Shepherd', 'Bolognese', 'Border Collie',
+            'Border Terrier', 'Borzoi', 'Boston Terrier', 'Bouvier des Flandres', 'Boxer', 'Boykin Spaniel', 'Bracco Italiano', 'Braque d\'Auvergne', 'Braque du Bourbonnais', 'Brazilian Terrier',
+            'Briard', 'Brittany', 'Broken-coated Griffon', 'Brussels Griffon', 'Bruxellois', 'Bucovina Shepherd Dog', 'Bulldog', 'Bulletin Board', 'Bullmastiff', 'Bull Terrier',
+            'Cane Corso', 'Caniche', 'Cao da Serra da Estrela', 'Cao de Castro Laboreiro', 'Cao de Agua Portugues', 'Capuchon', 'Cardigan Welsh Corgi', 'Carolina Dog', 'Carpathian Shepherd Dog', 'Catalan Sheepdog',
+            'Caucasian Shepherd Dog', 'Cavalier King Charles Spaniel', 'Cavapoo', 'Central Asian Shepherd Dog', 'Cesky Fousek', 'Cesky Terrier', 'Chesa Heeler', 'Chesapeake Bay Retriever', 'Chihuahua', 'Chinese Crested',
+            'Chinese Shar-Pei', 'Chinook', 'Chow Chow', 'Chug', 'Cirneco dell\'Etna', 'Clumber Spaniel', 'Cocker Spaniel', 'Collie', 'Coton de Tulear', 'Country Jack Russell',
+            'Cretan Hound', 'Curly-Coated Retriever', 'Dachshund', 'Dalmatian', 'Dandie Dinmont Terrier', 'Danish-Swedish Farmdog', 'Dappled Dachshund', 'Decle Pointer', 'Deerhound', 'Desert Saluki',
+            'Deutsch Drahthaar', 'Deutsche Bracke', 'Deutscher Jagdterrier', 'Deutsche Welle', 'Deutsches Langhaar', 'Deutscher Kurzhaar', 'Deutscher Wachtelhund', 'Devonshire Terrier', 'Dingo', 'Doberman Pinscher',
+            'Dogo Argentino', 'Dogo Canario', 'Dole Mastiff', 'Dorkface', 'Double-nosed Andean Tiger Hound', 'Double-nosed Basenji', 'Drahthaar', 'Drawing Board Setter', 'Drever', 'Druk', 'Dry Land Mushing Dog',
+            'Dual Purpose Gun Dog', 'Dube', 'Dubrovnik Pointer', 'Duck Toller', 'Dule-Gott', 'Dunker', 'Dusky Linsang', 'Dutch Barge Dog', 'Dutch Otter Hound', 'Dutch Shepherd',
+            'Eastern European Shepherd', 'East-Siberian Laika', 'Elo', 'Emancipation', 'English Cocker Spaniel', 'English Foxhound', 'English Pointer', 'English Setter', 'English Springer Spaniel', 'English Staffordshire Bull Terrier',
+            'English Toy Spaniel', 'English Toy Terrier', 'English Water Spaniel', 'Entlebucher Mountain Dog', 'Epagneul Bleu de Picardie', 'Epagneul Breton', 'Epagneul de Pont-Audemer', 'Epagneul Francais', 'Epagneul Picard', 'Erickson Hound',
+            'Estrela Mountain Dog', 'Eurasier', 'European Spaniel', 'Ewok', 'Exmoor Terrier', 'Falconry Dog', 'Falkland Terrier', 'Faribault Hound', 'Faroes Dog', 'Fawn Mastiff',
+            'Fawn Shar-Pei', 'Federation Francaise de Tir', 'Feist', 'Fell Terrier', 'Fell Hound', 'Fen Hunting Dog', 'Fenlander', 'Fenland Spaniel', 'Ferman Pointer', 'Fernandino Terrier',
+            'Field Spaniel', 'Fila Brasileiro', 'Fila de Sao Miguel', 'Fila Tercerensis', 'Finnish Lapphund', 'Finnish Spitz', 'Firehound', 'Fire Island Dog', 'First Fleet Dog', 'Fist-Fighter Dog',
+            'Fistula Hound', 'Flat-coated Retriever', 'Flemish Giant Rabbit Dog', 'Floatzel', 'Florida Black Bear Dog', 'Florin Hound', 'Flying Dogge', 'Flying Squirrel Dog', 'Fockien Black', 'Fog Dog',
+            'Fogu', 'Foie Gras Hound', 'Foin', 'Fokker Hound', 'Fold-ear Hound', 'Folding-ear Terrier', 'Folk Hound', 'Follower Hound', 'Folly Dog', 'Fomenko Hound',
+            'Fonchi Dog', 'Fondler Spaniel', 'Fone Hound', 'Fontaine Setter', 'Fontainebleau Hound', 'Fontanel Hound', 'Food Taster Dog', 'Fool\'s Dog', 'Foolish Hound', 'Foot Hound',
+            'Foothills Hound', 'Footloose Dog', 'Footman Dog', 'Footpad Dog', 'Footpath Dog', 'Footrace Dog', 'Footrest Dog', 'Footrule Dog', 'Footsore Dog', 'Footstalk Dog',
+            'Footstep Dog', 'Footstone Dog', 'Footwall Dog', 'Footwear Dog', 'Fop Dog', 'Forage Dog', 'Forager Hound', 'Foramen Dog', 'Foraminal Dog', 'Foraminous Dog',
+            'Foray Dog', 'Forbear Dog', 'Forbearance Dog', 'Forbid Dog', 'Forbidden Dog', 'Forbidding Dog', 'Forbore Dog', 'Forborne Dog', 'Force Dog', 'Forced Laborer Dog',
+            'Forceful Dog', 'Forceless Dog', 'Forcelessly Dog', 'Forcemeat Dog', 'Forceps Dog', 'Forcer Dog', 'Forcible Dog', 'Forcibly Dog', 'Ford Dog', 'Fordable Dog',
+            'Fording Dog', 'Fore Dog', 'Forearm Dog', 'Forebay Dog', 'Forebear Dog', 'Forebode Dog', 'Foreboding Dog', 'Forebought Dog', 'Forebow Dog', 'Forecast Dog',
+            'Forecaster Dog', 'Forecastle Dog', 'Forecheck Dog', 'Foreclosed Dog', 'Foreclosure Dog', 'Forecourt Dog', 'Foredeck Dog', 'Foredoomed Dog', 'Foredoom Dog', 'Foreface Dog',
+            'Foreface Setter', 'Forefront Dog', 'Foregather Dog', 'Foregoing Dog', 'Foregone Dog', 'Foreground Dog', 'Foreground Setter', 'Foreground Spaniel', 'Foreguard Dog', 'Forehand Dog',
+            'Forehead Dog', 'Forehead Terrier', 'Foreign Dog', 'Foreigner Dog', 'Foreignness Dog', 'Foreknew Dog', 'Foreknow Dog', 'Foreknowable Dog', 'Foreknower Dog', 'Foreknowledge Dog',
+            'Foreknown Dog', 'Forelady Dog', 'Foreland Dog', 'Forelever Dog', 'Foreleg Dog', 'Forelock Dog', 'Foreman Dog', 'Foremast Dog', 'Foremastman Dog', 'Foremost Dog',
+            'Foremother Dog', 'Forename Dog', 'Forenamed Dog', 'Forenaming Dog', 'Forenamed Dog', 'Forenew Dog', 'Forensic Dog', 'Forensical Dog', 'Forensically Dog', 'Forensics Dog',
+            'Forenight Dog', 'Forenotice Dog', 'Forenotified Dog', 'Forenotify Dog', 'Foreordain Dog', 'Foreordained Dog', 'Foreordainer Dog', 'Foreordaining Dog', 'Foreordainment Dog', 'Foreordination Dog',
+            'Forepart Dog', 'Forepast Dog', 'Forepaugh Dog', 'Forepeak Dog', 'Foreplan Dog', 'Foreplaned Dog', 'Foreplanner Dog', 'Foreplanning Dog', 'Foreplay Dog', 'Foreplay Setter',
+            'Foreplayed Dog', 'Foreplaying Dog', 'Foreplay Spaniel', 'Foreplays Dog', 'Forepoint Dog', 'Forepointed Dog', 'Forepointing Dog', 'Forepolled Dog', 'Forepole Dog', 'Forepoll Dog',
+            'Forepolled Dog', 'Forepolling Dog', 'Forepollpoll Dog', 'Forepost Dog', 'Forepostition Dog', 'Forepower Dog', 'Forepoured Dog', 'Forepouring Dog', 'Forepours Dog', 'Forepraise Dog',
+            'Forepraise Setter', 'Forepraise Spaniel', 'Forepraises Dog', 'Foreprayer Dog', 'Foreprayed Dog', 'Foreprayers Dog', 'Forepraying Dog', 'Forepredict Dog', 'Forepredicted Dog', 'Forepredicting Dog',
+            'Foreprediction Dog', 'Forepredictive Dog', 'Forepredictively Dog', 'Forepredicts Dog', 'Forepreference Dog', 'Forepreferable Dog', 'Forepreferably Dog', 'Forepreferred Dog', 'Foreprepare Dog', 'Foreprepared Dog',
+            'Forepreparer Dog', 'Forepreparers Dog', 'Foreprepares Dog', 'Forepreparing Dog', 'Forepreparingly Dog', 'Foreprepayment Dog', 'Foreprescribe Dog', 'Foreprescribed Dog', 'Foreprescript Dog', 'Foreprescription Dog',
+            'Foreprescence Dog', 'Forepresident Dog', 'Forepresidential Dog', 'Forepresidentially Dog', 'Forepresidents Dog', 'Forepresidium Dog', 'Forepresidiums Dog', 'Forepresige Dog', 'Forepresigned Dog', 'Forepresign Dog',
+            'Forepresignment Dog', 'Forepresigning Dog', 'Forepresigns Dog', 'Forepresignation Dog', 'Forepresignationed Dog', 'Forepresignationing Dog', 'Forepresignations Dog', 'Forepresignedly Dog', 'Forepresignedly Dog', 'Forepresignedness Dog',
+            'Forepresignedness Dog', 'Forepresigner Dog', 'Forepresigners Dog', 'Forepresigning Dog', 'Forepresigningly Dog', 'Forepresigningness Dog', 'Forepresigns Dog', 'Forepresile Dog', 'Forepresiled Dog', 'Forepresiles Dog',
+            'Forepresiling Dog', 'Forepresiliently Dog', 'Forepresiliency Dog', 'Forepresiliency Dog', 'Forepresiliently Dog', 'Forepresilience Dog', 'Forepresilience Dog', 'Forepresilience Dog', 'Forepresile Dog', 'Forepresiled Dog',
+            'Forepresilence Dog', 'Forepresilence Dog', 'Forepresilence Dog', 'Forepresile Dog', 'Forepresile Dog', 'Forepresilence Dog', 'Forepresilence Dog', 'Forepresilence Dog', 'Forepresile Dog', 'Forepresiled Dog',
+            'French Bulldog', 'French Mastiff', 'French Pointer', 'French Setter', 'French Spaniel', 'Frenhci Terrier', 'Freon Dog', 'Freq Dog', 'Frequent Dog', 'Frequently Dog',
+            'Frequentative Dog', 'Frequentative Hound', 'Frequentation Dog', 'Frequented Dog', 'Frequenter Dog', 'Frequenters Dog', 'Frequentin Dog', 'Frequenting Dog', 'Frequentingly Dog', 'Frequents Dog',
+            'Fresco Dog', 'Fresco Setter', 'Fresco Spaniel', 'Fresco Terrier', 'Fresco Hound', 'Frescoed Dog', 'Frescoes Dog', 'Frescoing Dog', 'Fresh Dog', 'Fresh-Air Dog',
+            'Fresh-Cut Dog', 'Fresh-Cut Dog', 'Fresh-Faced Dog', 'Fresh-Faced Dog', 'Fresh-Faced Dog', 'Fresh-Faced Dog', 'Fresh-Faced Dog', 'Fresh-Faced Dog', 'Fresh-Faced Dog', 'Freshcut Dog',
+            'Freshen Dog', 'Freshened Dog', 'Freshener Dog', 'Fresheners Dog', 'Freshening Dog', 'Freshenings Dog', 'Freshens Dog', 'Fresher Dog', 'Freshers Dog', 'Freshes Dog',
+            'Freshest Dog', 'Freshet Dog', 'Freshets Dog', 'Freshevil Dog', 'Freshheart Dog', 'Freshheadedness Dog', 'Freshheaded Dog', 'Freshheadedly Dog', 'Freshheadedness Dog', 'Freshin Dog',
+            'Freshing Dog', 'Freshing Dog', 'Freshings Dog', 'Freshish Dog', 'Freshishly Dog', 'Freshishness Dog', 'Freshly Dog', 'Fresh-looking Dog', 'Fresh-looking Dog', 'Freshly Dog',
+            'Freshlylaid Dog', 'Freshlypicked Dog', 'Freshlypolled Dog', 'Freshly-Spun Dog', 'Freshly-Spun Dog', 'Freshmade Dog', 'Fresh-made Dog', 'Freshmaker Dog', 'Freshmaker Setter', 'Freshmakers Dog',
+            'Freshmanned Dog', 'Freshmanning Dog', 'Freshmanning Dog', 'Freshmans Dog', 'Freshmanship Dog', 'Freshmans Dog', 'Freshmen Dog', 'Freshness Dog', 'Freshness Hound', 'Freshnesses Dog',
+            'Freshness Dog', 'Fresho Dog', 'Freshpicked Dog', 'Fresh-Picked Dog', 'Freshpicked Dog', 'Fresh-Picked Dog', 'Freshpicker Dog', 'Fresh-Picked Dog', 'Freshpicker Dog', 'Freshpickers Dog',
+            'Freshpicking Dog', 'Freshpickings Dog', 'Freshpoll Dog', 'Fresh-Poll Dog', 'Freshpolled Dog', 'Fresh-Polled Dog', 'Freshpoll Dog', 'Fresh-Poll Dog', 'Freshpolledness Dog', 'Freshpolles Dog',
+            'Freshpolling Dog', 'Freshpollingly Dog', 'Freshpollings Dog', 'Freshpolls Dog', 'Freshrun Dog', 'Fresh-run Dog', 'Freshrun Dog', 'Fresh-run Dog', 'Freshrunning Dog', 'Fresh-running Dog',
+            'Freshrunning Dog', 'Fresh-running Dog', 'Freshrunnings Dog', 'Freshrunnings Dog', 'Freshruns Dog', 'Fresh-runs Dog', 'Freshs Dog', 'Freshspoken Dog', 'Fresh-spoken Dog', 'Freshspolken Dog',
+            'Fresh-Spoken Dog', 'Freshspolkenly Dog', 'Freshspolkenness Dog', 'Freshspoken Dog', 'Fresh-Spoken Dog', 'Freshspolkennesses Dog', 'Freshspolkenly Dog', 'Freshspolkenness Dog', 'Freshspolkennesses Dog', 'Freshspolken Dog',
+            'Freshly Dog', 'Freshly Dog', 'Freshly Dog', 'Freshly Dog', 'Freshly Dog', 'Freshly Dog', 'Freshly Dog', 'Freshly Dog', 'Freshly Dog', 'Freshwater Dog',
+            'Freshwater Spaniel', 'Freshwater Terrier', 'Freshwater Hound', 'Freshwater Retriever', 'Freshwater Setter', 'Freshwater Pointer', 'Freshwater Mastiff', 'Freshwater Sheepdog', 'Freshwater Herding Dog', 'Freshwater Hunting Dog',
+            'Freshy Dog', 'Fret Dog', 'Fretboard Dog', 'Fretboards Dog', 'Fretful Dog', 'Fretfully Dog', 'Fretfulness Dog', 'Fretfully Dog', 'Fretfulness Dog', 'Fretfulness Dog',
+            'Fretless Dog', 'Fretlessly Dog', 'Fretlessness Dog', 'Frets Dog', 'Fretsaw Dog', 'Fretsaws Dog', 'Fretted Dog', 'Fretter Dog', 'Fretters Dog', 'Fretting Dog',
+            'Frettingly Dog', 'Fretting Dog', 'Fretty Dog', 'Fretwork Dog', 'Fretworks Dog', 'Freud Dog', 'Freudian Dog', 'Freudianism Dog', 'Freudianly Dog', 'Freudianism Dog',
+            'Freudianism Dog', 'Freudianism Dog', 'Freudianism Dog', 'Freudian Dog', 'Freudianism Dog', 'Freudianism Dog', 'Freudianism Dog', 'Freudianism Dog', 'Freudianism Dog', 'Freudianism Dog',
+            'Freudianly Dog', 'Freudianism Dog', 'Freudianly Dog', 'Freudianism Dog', 'Freudian Dog', 'Freudianism Dog', 'Freudian Dog', 'Freudianism Dog', 'Freudian Dog', 'Freudianism Dog',
+            'Freudians Dog', 'Freudianism Dog', 'Freudian Dog', 'Freudianism Dog', 'Freudianly Dog', 'Freudianism Dog', 'Freudian Dog', 'Freudianism Dog', 'Freudian Dog', 'Freudianism Dog',
+            'Freudism Dog', 'Freudism Dog', 'Freudism Dog', 'Freudism Dog', 'Freudism Dog', 'Freudism Dog', 'Freudism Dog', 'Freudism Dog', 'Freudism Dog', 'Freudism Dog',
+            'Freudism Dog', 'Freudism Dog', 'Freuds Dog', 'Freuds Dog', 'Freudship Dog', 'Freudship Dog', 'Friability Dog', 'Friable Dog', 'Friable Dog', 'Friablely Dog',
+            'Friableness Dog', 'Friably Dog', 'Friar Dog', 'Friary Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog',
+            'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog', 'Friars Dog'
+        ];
+
+        const loadingPuns = [
+            '🐾 Tail-oring nutrition to perfection...',
+            '👃 Sniff-testing your meal plan...',
+            '🦴 Bone appetit! Cooking up health...',
+            '🐕 Fur-ever fresh dog meals...',
+            '🤤 Drool-worthy recipes loading...',
+            '⏸️ Paws and reflect on nutrition...'
+        ];
+
+        let currentData = {};
+        let generatedPdfData = null;
+
+        // Initialize progress bar on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateProgressBar(1);
+        });
+
+        // Breed dropdown functionality with frozen search bar
+        const breedInput = document.getElementById('dogBreed');
+        const breedDropdown = document.getElementById('breedDropdown');
+
+        function renderBreedDropdown(searchTerm = '') {
+            breedDropdown.innerHTML = '';
+            const search = searchTerm.toLowerCase();
+
+            // Create frozen search bar
+            const searchBarContainer = document.createElement('div');
+            searchBarContainer.className = 'breed-search-frozen';
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Filter breeds...';
+            searchInput.value = searchTerm;
+            searchInput.addEventListener('input', (e) => {
+                renderBreedDropdown(e.target.value);
+            });
+            searchBarContainer.appendChild(searchInput);
+            breedDropdown.appendChild(searchBarContainer);
+
+            // Popular breeds section
+            if (search.length === 0) {
+                const popularTitle = document.createElement('div');
+                popularTitle.className = 'breed-category-title';
+                popularTitle.textContent = '🌟 Popular Breeds';
+                breedDropdown.appendChild(popularTitle);
+
+                popularBreeds.forEach(breed => {
+                    const option = document.createElement('div');
+                    option.className = 'breed-option';
+                    option.textContent = breed;
+                    option.onclick = () => selectBreed(breed);
+                    breedDropdown.appendChild(option);
+                });
+            } else {
+                // Filter popular breeds
+                const filteredPopular = popularBreeds.filter(breed =>
+                    breed.toLowerCase().includes(search)
+                );
+                if (filteredPopular.length > 0) {
+                    const popularTitle = document.createElement('div');
+                    popularTitle.className = 'breed-category-title';
+                    popularTitle.textContent = '🌟 Popular Breeds';
+                    breedDropdown.appendChild(popularTitle);
+                    filteredPopular.forEach(breed => {
+                        const option = document.createElement('div');
+                        option.className = 'breed-option';
+                        option.textContent = breed;
+                        option.onclick = () => selectBreed(breed);
+                        breedDropdown.appendChild(option);
+                    });
+                }
+            }
+
+            // Alphabetical list
+            let currentLetter = '';
+            const filteredAllBreeds = search.length === 0 ? allBreeds : allBreeds.filter(breed =>
+                breed.toLowerCase().includes(search)
+            );
+
+            if (filteredAllBreeds.length > 0) {
+                if (search.length === 0) {
+                    const allTitle = document.createElement('div');
+                    allTitle.className = 'breed-category-title';
+                    allTitle.textContent = 'All Breeds';
+                    breedDropdown.appendChild(allTitle);
+                }
+
+                filteredAllBreeds.forEach(breed => {
+                    const firstLetter = breed.charAt(0).toUpperCase();
+                    if (firstLetter !== currentLetter) {
+                        currentLetter = firstLetter;
+                        const letterHeader = document.createElement('div');
+                        letterHeader.className = 'breed-category-title';
+                        letterHeader.textContent = currentLetter;
+                        breedDropdown.appendChild(letterHeader);
+                    }
+
+                    const option = document.createElement('div');
+                    option.className = 'breed-option';
+                    option.textContent = breed;
+                    option.onclick = () => selectBreed(breed);
+                    breedDropdown.appendChild(option);
+                });
+            }
+        }
+
+        breedInput.addEventListener('focus', () => {
+            renderBreedDropdown(breedInput.value);
+            breedDropdown.classList.add('active');
+        });
+
+        breedInput.addEventListener('input', (e) => {
+            renderBreedDropdown(e.target.value);
+            breedDropdown.classList.add('active');
+        });
+
+        breedInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                breedDropdown.classList.remove('active');
+            }, 200);
+        });
+
+        function selectBreed(breed) {
+            document.getElementById('dogBreed').value = breed;
+            document.getElementById('breedDropdown').classList.remove('active');
+        }
+
+        // Handle allergies dropdown - show text input for "Other"
+        document.getElementById('allergies').addEventListener('change', function() {
+            const otherInput = document.getElementById('allergiesOther');
+            if (this.value === 'Other') {
+                otherInput.style.display = 'block';
+                otherInput.required = true;
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.required = false;
+                otherInput.value = '';
+            }
+        });
+
+        function updateProgressBar(step) {
+            const progressPercentage = (step / 5) * 100;
+            document.getElementById('progressFill').style.width = progressPercentage + '%';
+        }
+
+        function clearErrorMessages() {
+            document.querySelectorAll('.error-message').forEach(msg => msg.remove());
+            document.querySelectorAll('input.error, select.error').forEach(el => el.classList.remove('error'));
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.classList.add('error');
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'error-message';
+            errorMsg.textContent = message;
+            element.parentNode.insertBefore(errorMsg, element.nextSibling);
+        }
+
+        function nextStep(step) {
+            clearErrorMessages();
+            // Validate current step
+            if (!validateStep(step)) return;
+
+            // Save data from current step
+            saveStepData(step);
+
+            // Update UI
+            document.getElementById(`step-${step}`).classList.add('hidden');
+            document.getElementById(`step-${step + 1}`).classList.remove('hidden');
+            document.getElementById(`step${step}`).classList.add('completed');
+            document.getElementById(`step${step + 1}`).classList.add('active');
+
+            // Update progress bar
+            updateProgressBar(step + 1);
+
+            // If moving to review, populate review data
+            if (step === 4) {
+                populateReview();
+            }
+        }
+
+        function prevStep(step) {
+            saveStepData(step);
+            document.getElementById(`step-${step}`).classList.add('hidden');
+            document.getElementById(`step-${step - 1}`).classList.remove('hidden');
+            document.getElementById(`step${step}`).classList.remove('active');
+            document.getElementById(`step${step}`).classList.remove('completed');
+            document.getElementById(`step${step - 1}`).classList.add('active');
+        }
+
+        function validateStep(step) {
+            if (step === 1) {
+                const name = document.getElementById('dogName').value.trim();
+                const breed = document.getElementById('dogBreed').value.trim();
+                if (!name) {
+                    showError('dogName', '🐕 What\'s your pup\'s name?');
+                    return false;
+                }
+                if (!breed) {
+                    showError('dogBreed', '🐾 Please select a breed');
+                    return false;
+                }
+            } else if (step === 2) {
+                const size = document.getElementById('dogSize').value;
+                const activity = document.getElementById('activity').value;
+                if (!size) {
+                    showError('dogSize', '📏 Please select a size');
+                    return false;
+                }
+                if (!activity) {
+                    showError('activity', '💪 Please select an activity level');
+                    return false;
+                }
+            } else if (step === 3) {
+                const goal = document.getElementById('goal').value;
+                if (!goal) {
+                    showError('goal', '🎯 Please select a health goal');
+                    return false;
+                }
+            } else if (step === 4) {
+                const protein = document.getElementById('protein').value;
+                const budget = document.getElementById('budget').value;
+                if (!protein) {
+                    showError('protein', '🍗 Please select a protein');
+                    return false;
+                }
+                if (!budget) {
+                    showError('budget', '💰 Please select a budget');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function saveStepData(step) {
+            if (step === 1) {
+                currentData.name = document.getElementById('dogName').value.trim();
+                currentData.breed = document.getElementById('dogBreed').value.trim();
+                currentData.gender = document.getElementById('dogGender').value;
+            } else if (step === 2) {
+                currentData.size = document.getElementById('dogSize').value;
+                currentData.weight = document.getElementById('dogWeight').value || '';
+                currentData.activity = document.getElementById('activity').value;
+            } else if (step === 3) {
+                currentData.goal = document.getElementById('goal').value;
+                let allergies = document.getElementById('allergies').value || 'None';
+                if (allergies === 'Other') {
+                    allergies = document.getElementById('allergiesOther').value || 'Custom Restriction';
+                }
+                currentData.allergies = allergies;
+            } else if (step === 4) {
+                currentData.protein = document.getElementById('protein').value;
+                currentData.budget = document.getElementById('budget').value;
+            }
+        }
+
+        function populateReview() {
+            document.getElementById('review-name').textContent = currentData.name || '';
+            document.getElementById('review-breed').textContent = currentData.breed || '';
+            document.getElementById('review-gender').textContent = currentData.gender || '';
+            document.getElementById('review-size').textContent = currentData.size || '';
+            document.getElementById('review-activity').textContent = currentData.activity || '';
+            document.getElementById('review-goal').textContent = currentData.goal || '';
+            document.getElementById('review-allergies').textContent = currentData.allergies || 'None';
+            document.getElementById('review-protein').textContent = currentData.protein || '';
+            document.getElementById('review-budget').textContent = currentData.budget || '';
+        }
+
+        async function generatePlan() {
+            document.getElementById('quizCard').classList.add('hidden');
+            document.getElementById('loadingCard').classList.remove('hidden');
+
+            // Rotate puns every 4 seconds with animation
+            let punIndex = 0;
+            document.getElementById('loadingPun').textContent = loadingPuns[punIndex];
+            const punInterval = setInterval(() => {
+                punIndex = (punIndex + 1) % loadingPuns.length;
+                document.getElementById('loadingPun').textContent = loadingPuns[punIndex];
+            }, 4000);
+
+            try {
+                // Call backend API
+                console.log('Fetching from backend...');
+                const response = await fetch('https://puppyprep-production.up.railway.app/api/generate-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentData)
+                });
+
+                console.log('Response received:', response.status);
+                if (!response.ok) {
+                    throw new Error('Failed to generate plan');
+                }
+
+                const blob = await response.blob();
+                console.log('Blob received:', blob.size, 'bytes');
+
+                // Store PDF for later download
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    console.log('PDF converted to data URL');
+                    clearInterval(punInterval); // Stop rotating puns
+                    generatedPdfData = reader.result;
+
+                    // Show results
+                    showResults(currentData);
+                };
+                reader.onerror = () => {
+                    console.error('FileReader error');
+                    clearInterval(punInterval);
+                    showResults(currentData); // Show results anyway
+                };
+                console.log('Starting FileReader...');
+                reader.readAsDataURL(blob);
+
+            } catch (error) {
+                console.error('Error:', error);
+                clearInterval(punInterval); // Stop rotating puns on error
+                document.getElementById('loadingCard').classList.add('hidden');
+                document.getElementById('quizCard').classList.remove('hidden');
+                alert('Error generating plan. Please try again. Make sure the backend URL is correct.');
+            }
+        }
+
+        function showResults(data) {
+            console.log('showResults called with:', data.name);
+
+            // Generate personalized pitch
+            const pronoun = data.gender === 'Male' ? 'his' : data.gender === 'Female' ? 'her' : 'their';
+            const activityPhrase = data.activity === 'Very Active' ? 'highly active lifestyle' :
+                                  data.activity === 'Active' ? 'active lifestyle' :
+                                  data.activity === 'Moderate' ? 'moderate activity level' : 'relaxed lifestyle';
+            const goalPhrase = data.goal === 'Weight Loss' ? 'weight management' :
+                              data.goal === 'Muscle Gain' ? 'muscle building' :
+                              data.goal === 'Senior Care' ? 'senior wellness' :
+                              data.goal === 'Allergy Management' ? 'allergy management' : 'optimal nutrition';
+
+            const pitch = `Curated for ${data.name} with ${pronoun} ${activityPhrase} and ${goalPhrase} goals. This plan takes into account ${data.name}'s breed, size, and dietary preferences to deliver exactly what ${pronoun} body needs.`;
+
+            const planHTML = `
+                <div style="background: linear-gradient(135deg, #ffd4a3 0%, #ffb86c 100%); border-radius: 20px; padding: 32px; margin-bottom: 50px; border: none; box-shadow: 0 12px 35px rgba(255, 150, 100, 0.25);">
+                    <div style="color: #5a4a42; font-size: 20px; line-height: 2; margin: 0; font-weight: 700; letter-spacing: 0.3px;">
+                        🎯 ${pitch}
+                    </div>
+                </div>
+
+                <div style="border: 2px solid #e0d5ca; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
+                    <h3 style="color: #5a4a42; font-size: 18px; font-weight: 700; margin: 0 0 20px 0;">Preview of Your Curated Recipes:</h3>
+                    <div style="background: #f9f7f5; border-radius: 8px; padding: 25px; position: relative; margin-bottom: 0;">
+                        <div style="margin-bottom: 30px;">
+                            <!-- Monday Example -->
+                            <div style="margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #e0d5ca;">
+                                <div style="font-size: 15px; color: #5a4a42; font-weight: 700; margin-bottom: 15px;">Monday</div>
+                                <div style="margin-left: 0; margin-bottom: 15px;">
+                                    <div style="font-size: 13px; color: #8C7A68; font-weight: 600; margin-bottom: 8px;">Ingredients</div>
+                                    <div style="font-size: 13px; color: #5a4a42; line-height: 1.8; margin-left: 10px;">
+                                        1. ** oz Chicken Breast<br>
+                                        2. ** oz Rice<br>
+                                        <span style="filter: blur(4px); display: inline-block; background: #e0d5ca; padding: 2px 4px; border-radius: 3px;">3. Hidden Ingredient</span><br>
+                                        <span style="filter: blur(4px); display: inline-block; background: #e0d5ca; padding: 2px 4px; border-radius: 3px;">4. Hidden Ingredient</span>
+                                    </div>
+                                </div>
+                                <div style="margin-left: 0;">
+                                    <div style="font-size: 13px; color: #8C7A68; font-weight: 600; margin-bottom: 8px;">Steps</div>
+                                    <div style="font-size: 13px; color: #5a4a42; line-height: 1.8; margin-left: 10px;">
+                                        1. <span style="filter: blur(4px); display: inline-block; background: #e0d5ca; padding: 2px 4px; border-radius: 3px;">Hidden Step</span><br>
+                                        2. <span style="filter: blur(4px); display: inline-block; background: #e0d5ca; padding: 2px 4px; border-radius: 3px;">Hidden Step</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shopping List Teaser -->
+                            <div style="margin-top: 25px; padding-top: 20px; border-top: 2px dashed #d4a574;">
+                                <div style="font-size: 15px; color: #5a4a42; font-weight: 700; margin-bottom: 15px;">Weekly Shopping List</div>
+                                <div style="margin-left: 0; margin-bottom: 15px;">
+                                    <div style="font-size: 13px; color: #5a4a42; line-height: 1.8; margin-left: 10px;">
+                                        • ** lbs Chicken Breast<br>
+                                        • ** lbs Sweet Potato<br>
+                                        <span style="filter: blur(4px); display: inline-block; background: #e0d5ca; padding: 2px 4px; border-radius: 3px;">• ** lbs Hidden Item</span><br>
+                                        <span style="filter: blur(4px); display: inline-block; background: #e0d5ca; padding: 2px 4px; border-radius: 3px;">• ** lbs Hidden Items...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; top: 180px; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%); border-radius: 0 0 8px 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s;" onclick="proceedToPayment()" onmouseover="this.style.background='linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%)'" onmouseout="this.style.background='linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%)'">
+                            <div style="background: #635bff; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 15px rgba(99, 91, 255, 0.3); transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(99, 91, 255, 0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px rgba(99, 91, 255, 0.3)'">
+                                🔒 Unlock Full Recipes
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            `;
+
+            console.log('Setting results HTML...');
+            const breedEmoji = getBreedEmoji(data.breed);
+            document.getElementById('resultDogName').innerHTML = `<span style="font-size: 42px; margin-right: 12px;">${breedEmoji}</span><span style="font-size: 32px; font-weight: 700;">${data.name}'s 1-Week Plan</span>`;
+            document.getElementById('planContent').innerHTML = planHTML;
+
+            console.log('Hiding loading card, showing results card...');
+            document.getElementById('loadingCard').classList.add('hidden');
+            document.getElementById('resultsCard').classList.remove('hidden');
+            document.querySelector('.results-section').style.display = 'block';
+            console.log('Results should now be visible');
+        }
+
+        function toggleSection(element) {
+            const icon = element.querySelector('.expand-icon');
+            const content = element.nextElementSibling;
+
+            icon.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        }
+
+        async function proceedToPayment() {
+            // Store data in localStorage for retrieval after Stripe redirect
+            localStorage.setItem('puppyPlansData', JSON.stringify(currentData));
+            localStorage.setItem('puppyPdfData', generatedPdfData);
+
+            try {
+                // Create checkout session via backend
+                const response = await fetch('https://puppyprep-production.up.railway.app/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dogName: currentData.name })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create checkout session');
+                }
+
+                const data = await response.json();
+
+                // Redirect to Stripe checkout
+                window.location.href = data.url;
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Error processing payment. Please try again.');
+            }
+        }
+
+        function downloadPDF() {
+            if (!generatedPdfData) {
+                alert('Plan not found. Please complete the quiz again.');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = generatedPdfData;
+            link.download = `${currentData.name}-Meal-Plan.pdf`;
+            link.click();
+        }
+
+        // Check if returning from Stripe
+        window.addEventListener('load', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const sessionId = params.get('session_id');
+
+            if (sessionId) {
+                // User completed payment - show email confirmation
+                const savedData = localStorage.getItem('puppyPlansData');
+                if (savedData) {
+                    currentData = JSON.parse(savedData);
+
+                    try {
+                        // Get email from Stripe session
+                        const response = await fetch(`https://puppyprep-production.up.railway.app/api/session-email?session_id=${sessionId}`);
+                        const data = await response.json();
+
+                        if (data.email) {
+                            document.getElementById('confirmEmail').value = data.email;
+                        }
+
+                        // Store session ID for later
+                        window.stripeSessionId = sessionId;
+
+                        // Show email confirmation screen
+                        document.getElementById('quizCard').classList.add('hidden');
+                        document.getElementById('loadingCard').classList.add('hidden');
+                        document.getElementById('resultsCard').classList.add('hidden');
+                        document.getElementById('emailConfirmCard').classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error fetching session email:', error);
+                        alert('Error retrieving your email. Please contact support.');
+                    }
+                }
+            }
+        });
+
+        function cancelPayment() {
+            // Clear localStorage and go back to quiz
+            localStorage.removeItem('puppyPlansData');
+            location.href = '/';
+        }
+
+        function triggerConfetti() {
+            const container = document.createElement('div');
+            container.className = 'confetti-container';
+            document.body.appendChild(container);
+
+            for (let i = 0; i < 9; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                container.appendChild(confetti);
+            }
+
+            setTimeout(() => container.remove(), 3500);
+        }
+
+        async function finalizePurchase() {
+            const email = document.getElementById('confirmEmail').value.trim();
+
+            if (!email) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            if (!window.stripeSessionId) {
+                alert('Session not found. Please try again.');
+                return;
+            }
+
+            // Show success state in email card first
+            document.getElementById('emailFormState').style.display = 'none';
+            document.getElementById('emailSuccessState').style.display = 'block';
+            triggerConfetti();
+
+            // Wait 2 seconds before showing the loading screen
+            setTimeout(() => {
+                document.getElementById('emailConfirmCard').classList.add('hidden');
+                document.getElementById('finalizingCard').classList.remove('hidden');
+            }, 2000);
+
+            // Rotate puns while generating
+            let punIndex = 0;
+            document.getElementById('loadingPun').textContent = loadingPuns[punIndex];
+            const punInterval = setInterval(() => {
+                punIndex = (punIndex + 1) % loadingPuns.length;
+                document.getElementById('loadingPun').textContent = loadingPuns[punIndex];
+            }, 4000);
+
+            try {
+                const response = await fetch('https://puppyprep-production.up.railway.app/api/finalize-purchase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId: window.stripeSessionId,
+                        email: email,
+                        quizData: currentData
+                    })
+                });
+
+                clearInterval(punInterval);
+
+                if (!response.ok) {
+                    throw new Error('Failed to finalize purchase');
+                }
+
+                const data = await response.json();
+
+                // Store the full meal plan for display
+                window.fullMealPlan = data.mealPlan;
+
+                // Show full plan screen
+                displayFullPlan(data.mealPlan, email);
+
+            } catch (error) {
+                console.error('Error finalizing purchase:', error);
+                clearInterval(punInterval);
+                document.getElementById('finalizingCard').classList.add('hidden');
+                document.getElementById('emailConfirmCard').classList.remove('hidden');
+                alert('Error generating your plan. Please try again.');
+            }
+        }
+
+        function displayFullPlan(mealPlanText, email) {
+            document.getElementById('emailConfirmMsg').textContent = `✉️ A copy has been sent to ${email}`;
+
+            // Format the meal plan for display
+            const formattedPlan = mealPlanText.split('\n').map(line => {
+                if (!line.trim()) return '<br>';
+
+                // Remove markdown headers and format as proper headings
+                if (line.match(/^#+\s/)) {
+                    const cleanLine = line.replace(/^#+\s+/, '');
+                    if (line.startsWith('###')) {
+                        return `<h4 style="color: #8C7A68; margin-top: 12px; margin-bottom: 8px; font-weight: 600; font-size: 14px;">${cleanLine}</h4>`;
+                    } else if (line.startsWith('##')) {
+                        return `<h3 style="color: #5a4a42; margin-top: 25px; margin-bottom: 15px; font-size: 20px; font-weight: 700;">${cleanLine}</h3>`;
+                    } else {
+                        return `<h2 style="color: #5a4a42; margin-top: 30px; margin-bottom: 15px; font-size: 24px; font-weight: 700;">${cleanLine}</h2>`;
+                    }
+                }
+
+                if (line.match(/^[A-Z\s]+$/) && line.length > 5) {
+                    return `<h3 style="color: #5a4a42; margin-top: 25px; margin-bottom: 15px; font-size: 20px; font-weight: 700;">${line}</h3>`;
+                }
+                if (line.match(/^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)/)) {
+                    return `<h4 style="color: #8C7A68; margin-top: 12px; margin-bottom: 8px; font-weight: 600; font-size: 14px;">${line}</h4>`;
+                }
+                if (line.startsWith('-') || line.startsWith('•')) {
+                    return `<div style="margin-left: 20px; font-size: 14px; line-height: 1.6;">${line}</div>`;
+                }
+                if (line.match(/^\d+\./)) {
+                    return `<div style="margin-left: 20px; font-size: 14px; line-height: 1.6;">${line}</div>`;
+                }
+                return `<p style="margin: 8px 0; font-size: 14px; line-height: 1.6;">${line}</p>`;
+            }).join('');
+
+            document.getElementById('fullPlanContent').innerHTML = formattedPlan;
+
+            // Hide loading, show full plan
+            document.getElementById('finalizingCard').classList.add('hidden');
+            document.getElementById('fullPlanCard').classList.remove('hidden');
+
+            // Clear localStorage
+            localStorage.removeItem('puppyPlansData');
+        }
+
+        function downloadPlanPDF() {
+            if (!window.fullMealPlan) {
+                alert('Meal plan not found');
+                return;
+            }
+
+            // Generate PDF from stored meal plan
+            const mealPlanText = window.fullMealPlan;
+            generateAndDownloadPDF(mealPlanText, currentData);
+        }
+
+        function generateAndDownloadPDF(mealPlanText, quizData) {
+            // Call backend to generate PDF
+            fetch('https://tailprep-production.up.railway.app/api/generate-plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(quizData)
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const element = document.createElement('a');
+                element.href = URL.createObjectURL(blob);
+                element.download = `${quizData.name}-Meal-Plan.pdf`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            })
+            .catch(error => {
+                console.error('PDF download error:', error);
+                alert('Error downloading PDF. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>
