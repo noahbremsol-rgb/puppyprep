@@ -29,59 +29,57 @@ DOG INFORMATION:
 - Preferred Protein: ${quizData.protein}
 - Budget: ${quizData.budget}
 
-Create a personalized 1-week meal prep plan. Format your response EXACTLY like this:
+Create a personalized 1-week meal prep plan. Format your response EXACTLY like this (be concise and professional):
 
-SUMMARY
-[Write 3-4 sentences explaining why this plan is tailored for ${quizData.name} (${quizData.gender || 'gender not specified'}, ${quizData.weight || 'weight not specified'} lbs) based on breed, age, size, activity level, and goals]
+## SUMMARY
+Write 2-3 sentences explaining why this plan works for ${quizData.name} (${quizData.gender || 'gender not specified'}, ${quizData.weight || 'weight not specified'} lbs) based on their profile.
 
-DAILY CALORIC NEEDS
-[Calculate approximate daily calories needed based on size and activity]
+## DAILY CALORIC NEEDS
+Approximate daily calories for this dog.
 
-WEEKLY SHOPPING LIST
-[Organized list with quantities needed for the week - include all ingredients across all 7 days]
+## WEEKLY SHOPPING LIST
+Concise list of 6-8 main ingredients needed for the week with approximate quantities. Focus on quality over variety.
 
-1-WEEK MEAL PREP PLAN FOR ${quizData.name.toUpperCase()}
+## 1-WEEK MEAL PREP PLAN FOR ${quizData.name.toUpperCase()}
 
-MONDAY:
-Ingredients:
-1. [Ingredient with amount]
-2. [Ingredient with amount]
-3. [Ingredient with amount]
-4. [Ingredient with amount]
+### MONDAY
+**Ingredients:**
+1. [Amount] [Protein]
+2. [Amount] [Carb/Vegetable]
+3. [Amount] [Carb/Vegetable]
 
-Steps:
-1. [Preparation step]
-2. [Preparation step]
-3. [Preparation step]
-4. [Preparation step]
+**Preparation:**
+1. [Brief step]
+2. [Brief step]
 
-TUESDAY:
+### TUESDAY
 [same format]
 
-WEDNESDAY:
+### WEDNESDAY
 [same format]
 
-THURSDAY:
+### THURSDAY
 [same format]
 
-FRIDAY:
+### FRIDAY
 [same format]
 
-SATURDAY:
+### SATURDAY
 [same format]
 
-SUNDAY (TREAT DAY):
-[same format - include something special but still healthy]
+### SUNDAY (TREAT DAY)
+Include something special but balanced.
 
-DAILY PORTIONS FOR ${quizData.name.toUpperCase()}:
-Morning: [Specific breakdown with portions]
-Evening: [Specific breakdown with portions]
+## DAILY PORTIONS FOR ${quizData.name.toUpperCase()}
+Morning: [Amount] • Evening: [Amount]
 
-STORAGE & SAFETY TIPS:
-[3-4 tips specific to their situation]
+## STORAGE & MEAL PREP TIPS
+- [Storage tip]
+- [Prep tip]
+- [Serving tip]
 
-IMPORTANT NOTES:
-[Any special considerations for this dog's breed, age, or health goal]`;
+## HELPFUL NOTES
+Any breed-specific or age-specific considerations that matter.`;
 
   try {
     console.log('Calling Claude API...');
@@ -128,14 +126,20 @@ function generatePDF(mealPlanText, quizData) {
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
+    // Clean up markdown formatting from Claude output
+    let cleanText = mealPlanText
+      .replace(/^#+\s+/gm, '') // Remove markdown headers
+      .replace(/\*\*/g, '') // Remove bold markers
+      .trim();
+
     // Title
     doc.fontSize(28).font('Helvetica-Bold').text(`${quizData.name}'s`, { align: 'center' });
     doc.fontSize(28).font('Helvetica-Bold').text('1-Week Meal Prep Plan', { align: 'center' });
     doc.fontSize(12).font('Helvetica').fillColor('#8C7A68').text(`${quizData.breed || 'Dog'} • ${quizData.size} • ${quizData.activity}`, { align: 'center' });
     doc.moveDown();
 
-    // Content
-    doc.fontSize(11).font('Helvetica').fillColor('#000').text(mealPlanText, {
+    // Content (cleaned up)
+    doc.fontSize(11).font('Helvetica').fillColor('#000').text(cleanText, {
       align: 'left',
       lineGap: 4,
       width: 475
