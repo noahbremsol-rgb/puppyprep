@@ -349,7 +349,6 @@
         .loading-pun {
             color: #8C7A68;
             font-size: 15px;
-            font-style: italic;
             height: 20px;
             min-height: 20px;
             animation: fadeInOut 4s ease-in-out infinite;
@@ -400,6 +399,26 @@
                 top: 100vh;
                 opacity: 0;
                 transform: translateX(100px) rotate(720deg);
+            }
+        }
+
+        .food-particle {
+            position: absolute;
+            font-size: 24px;
+            animation: foodFall 4s ease-in forwards;
+            pointer-events: none;
+        }
+
+        @keyframes foodFall {
+            0% {
+                top: -50px;
+                opacity: 1;
+                transform: translateX(0) rotateZ(0deg);
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+                transform: translateX(150px) rotateZ(360deg);
             }
         }
 
@@ -594,7 +613,87 @@
             <p class="tagline">Personalized Dog Meal Plans</p>
         </header>
 
-        <div class="card" id="quizCard">
+        <!-- LANDING PAGE -->
+        <div class="card" id="landingPage" style="text-align: center; padding: 40px 40px 60px 40px;">
+            <h2 style="color: #5a4a42; font-size: 48px; margin-bottom: 20px; font-weight: 700; line-height: 1.1; letter-spacing: -0.5px;">Your Dog Deserves Better Than Generic Kibble</h2>
+            <p style="color: #8C7A68; font-size: 18px; margin-bottom: 40px; line-height: 1.6;">You personalize everything for your family. Why settle for one-size-fits-all for your best friend?</p>
+
+            <!-- What's Included Section -->
+            <div style="margin-bottom: 50px;">
+                <h3 style="color: #5a4a42; font-size: 24px; font-weight: 700; margin-bottom: 25px;">What's Included</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                    <div style="background: linear-gradient(135deg, #f0f9ed 0%, #f5fdf2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">📋</div>
+                        <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Full Week Plan</div>
+                        <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">7 days of balanced meals</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f0f9ed 0%, #f5fdf2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">⚡</div>
+                        <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Calorie & Macros</div>
+                        <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Precise nutrition breakdown</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f0f9ed 0%, #f5fdf2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🛒</div>
+                        <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Shopping List</div>
+                        <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Organized by ingredient</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f0f9ed 0%, #f5fdf2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">💰</div>
+                        <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Budget Breakdown</div>
+                        <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Cost per meal included</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f0f9ed 0%, #f5fdf2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">👨‍🍳</div>
+                        <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Step-by-Step Recipes</div>
+                        <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Easy to follow instructions</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f0f9ed 0%, #f5fdf2 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">💡</div>
+                        <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Prep Tips</div>
+                        <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Storage & meal prep hacks</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%); padding: 35px 40px; border-radius: 16px; margin-bottom: 45px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);">
+                <button class="btn-primary" onclick="startQuiz()" style="font-size: 22px; padding: 22px 70px; margin-bottom: 16px; background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); color: white; width: 100%; font-weight: 800; letter-spacing: 0.5px; border-radius: 10px; border: none; box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4); cursor: pointer; transition: all 0.3s ease;">Who is your dog?</button>
+                <p style="color: #5a4a42; font-size: 15px; margin: 0; font-weight: 600;">→ Answer 5 quick questions. Get a personalized meal plan in minutes.</p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #f9f7f5 0%, #faf8f5 100%); padding: 30px; border-radius: 12px; margin-bottom: 40px; border-left: 4px solid #2E7D32;">
+                <p style="color: #5a4a42; font-size: 16px; line-height: 1.8; margin-bottom: 0;">
+                    Your dog <strong>can't choose what they eat</strong>. But you can.
+                </p>
+                <p style="color: #5a4a42; font-size: 16px; line-height: 1.8; margin-top: 15px; margin-bottom: 0;">
+                    Every dog is different. Breed, age, size, activity, allergies - they all matter. Generic kibble ignores all of it. Tailored meals don't.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px;">
+                <div style="background: linear-gradient(135deg, #f9f7f5 0%, #faf8f5 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">🎯</div>
+                    <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Personalized</div>
+                    <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Based on breed, age, size, activity</div>
+                </div>
+                <div style="background: linear-gradient(135deg, #f9f7f5 0%, #faf8f5 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #d4a574;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">📋</div>
+                    <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">1-Week Meal Plan</div>
+                    <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Ready to cook with shopping list</div>
+                </div>
+                <div style="background: linear-gradient(135deg, #f9f7f5 0%, #faf8f5 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2E7D32;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">🚫</div>
+                    <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Customized Allergies</div>
+                    <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Avoid what doesn't work for them</div>
+                </div>
+                <div style="background: linear-gradient(135deg, #f9f7f5 0%, #faf8f5 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #d4a574;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">⚡</div>
+                    <div style="color: #5a4a42; font-weight: 700; font-size: 14px;">Just Minutes Away</div>
+                    <div style="color: #8C7A68; font-size: 13px; margin-top: 5px;">Your plan ready to go, just $5</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="quizCard" style="display: none;">
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
@@ -609,7 +708,7 @@
             <!-- Step 1: Dog Name & Breed -->
             <div class="quiz-step" id="step-1">
                 <h2 class="section-title">Tell Us About Your Pup 🐾</h2>
-                <p class="section-subtitle">Let's get to know your furry friend—no ruff experience necessary!</p>
+                <p class="section-subtitle">Let's get to know your furry friend - no rough experience necessary!</p>
 
                 <div class="form-group">
                     <label for="dogName">What's Your Dog's Name?</label>
@@ -703,6 +802,7 @@
                         <option value="Grain-Free">Grain-Free Diet</option>
                         <option value="Gluten Sensitivity">Gluten Sensitivity</option>
                         <option value="Dairy Free">Dairy Free</option>
+                        <option value="Low Fat">Low Fat (Pancreatitis)</option>
                         <option value="Multiple Allergies">Multiple Allergies</option>
                         <option value="Other">Other (Please Specify)</option>
                     </select>
@@ -718,7 +818,7 @@
             <!-- Step 4: Preferences -->
             <div class="quiz-step hidden" id="step-4">
                 <h2 class="section-title">Protein & Budget 💰</h2>
-                <p class="section-subtitle">Tail-ored to their taste and your budget—because great nutrition doesn't have to break the bank!</p>
+                <p class="section-subtitle">Tailored to their taste and your budget - because great nutrition doesn't have to break the bank!</p>
 
                 <div class="form-group">
                     <label for="protein">Preferred Protein</label>
@@ -838,7 +938,7 @@
                 <div id="fullPlanContent" style="padding: 40px; max-height: 70vh; overflow-y: auto; color: #5a4a42; line-height: 1.8; font-size: 15px;"></div>
 
                 <div class="button-group" style="padding: 30px; border-top: 2px solid #e0d5ca;">
-                    <button class="btn-secondary" onclick="location.href='/'">Create Another Plan</button>
+                    <button class="btn-secondary" onclick="localStorage.removeItem('quizStarted'); location.href='/'">Create Another Plan</button>
                     <button class="btn-primary stripe-button" onclick="downloadPlanPDF()" style="font-size: 16px;">📥 Download as PDF</button>
                 </div>
             </div>
@@ -976,9 +1076,13 @@
 
         let currentData = {};
         let generatedPdfData = null;
+        let generatedMealPlan = null;
+        let planGenerationPromise = null;
 
         // Initialize progress bar on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Only hide landing page if actively in the quiz/results flow
+            // Don't use quizStarted flag for page loads - always show landing page on fresh visits
             updateProgressBar(1);
         });
 
@@ -989,19 +1093,6 @@
         function renderBreedDropdown(searchTerm = '') {
             breedDropdown.innerHTML = '';
             const search = searchTerm.toLowerCase();
-
-            // Create frozen search bar
-            const searchBarContainer = document.createElement('div');
-            searchBarContainer.className = 'breed-search-frozen';
-            const searchInput = document.createElement('input');
-            searchInput.type = 'text';
-            searchInput.placeholder = 'Filter breeds...';
-            searchInput.value = searchTerm;
-            searchInput.addEventListener('input', (e) => {
-                renderBreedDropdown(e.target.value);
-            });
-            searchBarContainer.appendChild(searchInput);
-            breedDropdown.appendChild(searchBarContainer);
 
             // Popular breeds section
             if (search.length === 0) {
@@ -1121,6 +1212,14 @@
             errorMsg.className = 'error-message';
             errorMsg.textContent = message;
             element.parentNode.insertBefore(errorMsg, element.nextSibling);
+        }
+
+        function startQuiz() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('quizCard').style.display = 'block';
+            localStorage.setItem('quizStarted', 'true');
+            window.scrollTo(0, 0);
+            updateProgressBar(1);
         }
 
         function nextStep(step) {
@@ -1311,6 +1410,12 @@
                     </div>
                 </div>
 
+                <div style="background: linear-gradient(135deg, #f0e8e0 0%, #faf8f5 100%); border-radius: 12px; padding: 20px; margin-bottom: 25px; border-left: 4px solid #635bff;">
+                    <p style="color: #5a4a42; font-size: 14px; line-height: 1.7; margin: 0; font-weight: 500;">
+                        <strong>How Your Plan Was Created:</strong> This personalized meal plan is generated using veterinary nutrition science and research-backed guidelines. Each recipe is tailored to ${data.name}'s unique profile - accounting for breed characteristics, activity level, health goals, and dietary restrictions. Our AI works with established canine nutrition principles to deliver balanced, whole-food meals your pup will thrive on.
+                    </p>
+                </div>
+
                 <div style="border: 2px solid #e0d5ca; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
                     <h3 style="color: #5a4a42; font-size: 18px; font-weight: 700; margin: 0 0 20px 0;">Preview of Your Curated Recipes:</h3>
                     <div style="background: #f9f7f5; border-radius: 8px; padding: 25px; position: relative; margin-bottom: 0;">
@@ -1447,6 +1552,9 @@
                         document.getElementById('loadingCard').classList.add('hidden');
                         document.getElementById('resultsCard').classList.add('hidden');
                         document.getElementById('emailConfirmCard').classList.remove('hidden');
+
+                        // Start pre-generating the plan while user confirms email
+                        startPlanGeneration(window.stripeSessionId, data.email);
                     } catch (error) {
                         console.error('Error fetching session email:', error);
                         alert('Error retrieving your email. Please contact support.');
@@ -1458,7 +1566,34 @@
         function cancelPayment() {
             // Clear localStorage and go back to quiz
             localStorage.removeItem('puppyPlansData');
+            localStorage.removeItem('quizStarted');
             location.href = '/';
+        }
+
+        function startPlanGeneration(sessionId, email) {
+            // Start generating the plan in background while user confirms email
+            planGenerationPromise = fetch('https://puppyprep-production.up.railway.app/api/finalize-purchase', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: sessionId,
+                    email: email,
+                    quizData: currentData
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to generate plan');
+                return response.json();
+            })
+            .then(data => {
+                generatedMealPlan = data.mealPlan;
+                window.fullMealPlan = data.mealPlan;
+                return data;
+            })
+            .catch(error => {
+                console.error('Background plan generation error:', error);
+                return null;
+            });
         }
 
         function triggerConfetti() {
@@ -1466,13 +1601,25 @@
             container.className = 'confetti-container';
             document.body.appendChild(container);
 
+            // Add colorful confetti
             for (let i = 0; i < 9; i++) {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
                 container.appendChild(confetti);
             }
 
-            setTimeout(() => container.remove(), 3500);
+            // Add falling food/bones animation
+            const foodEmojis = ['🦴', '🍖', '🥩', '🍗'];
+            for (let i = 0; i < 12; i++) {
+                const food = document.createElement('div');
+                food.className = 'food-particle';
+                food.textContent = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+                food.style.left = Math.random() * 100 + '%';
+                food.style.animationDelay = (Math.random() * 0.5) + 's';
+                container.appendChild(food);
+            }
+
+            setTimeout(() => container.remove(), 4500);
         }
 
         async function finalizePurchase() {
@@ -1488,18 +1635,19 @@
                 return;
             }
 
-            // Show success state in email card first
-            document.getElementById('emailFormState').style.display = 'none';
-            document.getElementById('emailSuccessState').style.display = 'block';
-            triggerConfetti();
+            // If plan is already generated, show it immediately
+            if (generatedMealPlan) {
+                // Trigger confetti and show plan immediately
+                displayFullPlan(generatedMealPlan, email);
+                triggerConfetti();
+                return;
+            }
 
-            // Wait 2 seconds before showing the loading screen
-            setTimeout(() => {
-                document.getElementById('emailConfirmCard').classList.add('hidden');
-                document.getElementById('finalizingCard').classList.remove('hidden');
-            }, 2000);
+            // Otherwise, show loading and wait for plan generation
+            document.getElementById('emailConfirmCard').classList.add('hidden');
+            document.getElementById('finalizingCard').classList.remove('hidden');
 
-            // Rotate puns while generating
+            // Rotate puns while waiting
             let punIndex = 0;
             document.getElementById('loadingPun').textContent = loadingPuns[punIndex];
             const punInterval = setInterval(() => {
@@ -1508,29 +1656,20 @@
             }, 4000);
 
             try {
-                const response = await fetch('https://puppyprep-production.up.railway.app/api/finalize-purchase', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sessionId: window.stripeSessionId,
-                        email: email,
-                        quizData: currentData
-                    })
-                });
+                // Wait for plan generation (if still pending)
+                const data = await planGenerationPromise;
 
                 clearInterval(punInterval);
 
-                if (!response.ok) {
-                    throw new Error('Failed to finalize purchase');
+                if (!data || !data.mealPlan) {
+                    throw new Error('Failed to generate plan');
                 }
-
-                const data = await response.json();
-
-                // Store the full meal plan for display
-                window.fullMealPlan = data.mealPlan;
 
                 // Show full plan screen
                 displayFullPlan(data.mealPlan, email);
+
+                // Trigger confetti after plan is displayed
+                triggerConfetti();
 
             } catch (error) {
                 console.error('Error finalizing purchase:', error);
@@ -1544,42 +1683,106 @@
         function displayFullPlan(mealPlanText, email) {
             document.getElementById('emailConfirmMsg').textContent = `✉️ A copy has been sent to ${email}`;
 
-            // Format the meal plan for display
-            const formattedPlan = mealPlanText.split('\n').map(line => {
-                if (!line.trim()) return '<br>';
+            // Parse and format meal plan with beautiful sections and colors
+            const lines = mealPlanText.split('\n');
+            let formattedPlan = '';
+            let currentSectionTitle = '';
 
-                // Remove markdown headers and format as proper headings
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (!line.trim()) {
+                    continue;
+                }
+
+                // Handle main section headers
                 if (line.match(/^#+\s/)) {
-                    const cleanLine = line.replace(/^#+\s+/, '');
-                    if (line.startsWith('###')) {
-                        return `<h4 style="color: #8C7A68; margin-top: 12px; margin-bottom: 8px; font-weight: 600; font-size: 14px;">${cleanLine}</h4>`;
-                    } else if (line.startsWith('##')) {
-                        return `<h3 style="color: #5a4a42; margin-top: 25px; margin-bottom: 15px; font-size: 20px; font-weight: 700;">${cleanLine}</h3>`;
-                    } else {
-                        return `<h2 style="color: #5a4a42; margin-top: 30px; margin-bottom: 15px; font-size: 24px; font-weight: 700;">${cleanLine}</h2>`;
+                    const cleanLine = line.replace(/^#+\s+/, '').trim();
+
+                    // Major section headers
+                    const majorSections = ['SUMMARY', 'DAILY CALORIC NEEDS', 'WEEKLY SHOPPING LIST', 'STORAGE & MEAL PREP TIPS', 'CONSIDERATIONS', 'HELPFUL NOTES', 'DAILY PORTIONS', '1-WEEK MEAL PREP'];
+
+                    if (majorSections.some(s => cleanLine.includes(s))) {
+                        currentSectionTitle = cleanLine;
+                        // Rename "HELPFUL NOTES" to "CONSIDERATIONS"
+                        const displayTitle = cleanLine.replace('HELPFUL NOTES', 'CONSIDERATIONS');
+                        formattedPlan += `
+                            <div style="background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+                                       padding: 18px 20px;
+                                       margin: 30px 0 20px 0;
+                                       border-radius: 10px;
+                                       box-shadow: 0 4px 15px rgba(76, 175, 80, 0.15);">
+                                <h2 style="color: white; font-size: 18px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">
+                                    ${displayTitle}
+                                </h2>
+                            </div>
+                        `;
+                    } else if (line.startsWith('###')) {
+                        formattedPlan += `<h4 style="color: #4CAF50; margin-top: 15px; margin-bottom: 10px; font-weight: 700; font-size: 14px; letter-spacing: 0.2px;">${cleanLine}</h4>`;
                     }
+                    continue;
                 }
 
-                if (line.match(/^[A-Z\s]+$/) && line.length > 5) {
-                    return `<h3 style="color: #5a4a42; margin-top: 25px; margin-bottom: 15px; font-size: 20px; font-weight: 700;">${line}</h3>`;
-                }
+                // All-caps headers (like MONDAY, TUESDAY, etc)
                 if (line.match(/^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)/)) {
-                    return `<h4 style="color: #8C7A68; margin-top: 12px; margin-bottom: 8px; font-weight: 600; font-size: 14px;">${line}</h4>`;
+                    const dayName = line.split('\n')[0];
+                    formattedPlan += `
+                        <div style="background: linear-gradient(135deg, #d4a574 0%, #c4944a 100%);
+                                   padding: 12px 16px;
+                                   margin: 20px 0 12px 0;
+                                   border-radius: 6px;
+                                   display: inline-block;">
+                            <h3 style="color: white; font-weight: 700; font-size: 14px; margin: 0; letter-spacing: 0.3px;">
+                                ${dayName}
+                            </h3>
+                        </div>
+                    `;
+                    continue;
                 }
-                if (line.startsWith('-') || line.startsWith('•')) {
-                    return `<div style="margin-left: 20px; font-size: 14px; line-height: 1.6;">${line}</div>`;
+
+                // Clean up **text** formatting and remove table pipes
+                let cleanedLine = line.replace(/\*\*/g, '').replace(/\|/g, '').trim();
+
+                // Skip empty lines and table separators
+                if (!cleanedLine || cleanedLine.match(/^-+\s*$/)) continue;
+
+                // Ingredients/Preparation headers
+                if (cleanedLine.match(/^(Ingredients|Preparation):/i)) {
+                    formattedPlan += `<p style="color: #4CAF50; font-weight: 700; font-size: 13px; margin: 12px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">${cleanedLine}</p>`;
+                    continue;
                 }
-                if (line.match(/^\d+\./)) {
-                    return `<div style="margin-left: 20px; font-size: 14px; line-height: 1.6;">${line}</div>`;
+
+                // Bullet points and numbered lists
+                if (line.match(/^[\d+\.\-•\s]/)) {
+                    formattedPlan += `<div style="margin-left: 20px; font-size: 13px; line-height: 1.8; color: #5a4a42; margin-bottom: 6px;">${cleanedLine}</div>`;
+                    continue;
                 }
-                return `<p style="margin: 8px 0; font-size: 14px; line-height: 1.6;">${line}</p>`;
-            }).join('');
+
+                // Regular paragraphs
+                if (cleanedLine.trim()) {
+                    formattedPlan += `<p style="margin: 10px 0; font-size: 13px; line-height: 1.8; color: #5a4a42;">${cleanedLine}</p>`;
+                }
+            }
+
+            // Add bottom branding
+            formattedPlan += `
+                <div style="margin-top: 40px; padding-top: 25px; border-top: 2px solid #e0d5ca; text-align: right;">
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                        <span style="font-size: 18px;">🐾</span>
+                        <span style="color: #4CAF50; font-size: 14px; font-weight: 700; letter-spacing: 1px;">TAIL PREP</span>
+                    </div>
+                    <p style="color: #8C7A68; font-size: 11px; margin: 8px 0 0 0; font-style: italic;">Personalized nutrition for your pup</p>
+                </div>
+            `;
 
             document.getElementById('fullPlanContent').innerHTML = formattedPlan;
 
             // Hide loading, show full plan
             document.getElementById('finalizingCard').classList.add('hidden');
             document.getElementById('fullPlanCard').classList.remove('hidden');
+            document.getElementById('emailConfirmCard').classList.add('hidden');
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('quizCard').classList.add('hidden');
 
             // Clear localStorage
             localStorage.removeItem('puppyPlansData');
@@ -1597,11 +1800,14 @@
         }
 
         function generateAndDownloadPDF(mealPlanText, quizData) {
-            // Call backend to generate PDF
-            fetch('https://tailprep-production.up.railway.app/api/generate-plan', {
+            // Call backend with meal plan text to avoid regenerating from Claude (fast!)
+            fetch('https://puppyprep-production.up.railway.app/api/generate-plan', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(quizData)
+                body: JSON.stringify({
+                    quizData: quizData,
+                    mealPlanText: mealPlanText // Pass the pre-generated plan for fast PDF generation
+                })
             })
             .then(response => response.blob())
             .then(blob => {
