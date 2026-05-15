@@ -117,36 +117,80 @@ function generatePDF(mealPlanText, quizData) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
       bufferPages: true,
-      margin: 40
+      margin: 30,
+      size: 'A4'
     });
 
     const chunks = [];
-
     doc.on('data', chunk => chunks.push(chunk));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    // Clean up markdown formatting from Claude output
-    let cleanText = mealPlanText
-      .replace(/^#+\s+/gm, '') // Remove markdown headers
-      .replace(/\*\*/g, '') // Remove bold markers
-      .trim();
+    // Helper function to draw a section header with color background
+    const drawSectionHeader = (text) => {
+      doc.rect(30, doc.y, 540, 30).fillAndStroke('#635BFF', '#635BFF');
+      doc.fillColor('#FFFFFF').fontSize(14).font('Helvetica-Bold').text(text, 40, doc.y + 6, { width: 520 });
+      doc.moveDown(1.5);
+    };
 
-    // Title
-    doc.fontSize(28).font('Helvetica-Bold').text(`${quizData.name}'s`, { align: 'center' });
+    // Title section
+    doc.fontSize(32).font('Helvetica-Bold').fillColor('#5a4a42').text(`${quizData.name}'s`, { align: 'center' });
     doc.fontSize(28).font('Helvetica-Bold').text('1-Week Meal Prep Plan', { align: 'center' });
-    doc.fontSize(12).font('Helvetica').fillColor('#8C7A68').text(`${quizData.breed || 'Dog'} • ${quizData.size} • ${quizData.activity}`, { align: 'center' });
-    doc.moveDown();
+    doc.fontSize(11).fillColor('#8C7A68').text(`${quizData.breed || 'Dog'} • ${quizData.size} • ${quizData.activity}`, { align: 'center' });
+    doc.moveDown(2);
 
-    // Content (cleaned up)
-    doc.fontSize(11).font('Helvetica').fillColor('#000').text(cleanText, {
-      align: 'left',
-      lineGap: 4,
-      width: 475
-    });
+    // Parse and format the meal plan
+    const lines = mealPlanText.split('\n');
 
-    doc.moveDown();
-    doc.fontSize(9).fillColor('#A08E7A').text('Generated with ❤️ by Tail Prep', { align: 'center' });
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (!line.trim()) continue;
+
+      // Section headers (## SUMMARY, ## WEEKLY SHOPPING LIST, etc)
+      if (line.match(/^##\s+/)) {
+        const sectionTitle = line.replace(/^#+\s+/, '').trim();
+        drawSectionHeader(sectionTitle);
+        continue;
+      }
+
+      // Day headers (MONDAY, TUESDAY, etc)
+      if (line.match(/^###\s+(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)/)) {
+        const dayName = line.replace(/^#+\s+/, '').trim();
+        doc.fontSize(12).font('Helvetica-Bold').fillColor('#d4a574').text(dayName);
+        doc.moveDown(0.3);
+        continue;
+      }
+
+      // Clean markdown from line
+      let cleanLine = line.replace(/^\#+\s+/, '').replace(/\*\*/g, '').trim();
+
+      // Sub-headers (Ingredients:, Preparation:, etc)
+      if (cleanLine.match(/^(Ingredients|Preparation|Storage|Tips|Notes|Morning|Evening):/i)) {
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#635BFF').text(cleanLine);
+        doc.moveDown(0.2);
+        continue;
+      }
+
+      // List items
+      if (cleanLine.match(/^[\d+\.\-•]/)) {
+        doc.fontSize(10).font('Helvetica').fillColor('#5a4a42').text(cleanLine, { indent: 20 });
+        doc.moveDown(0.2);
+        continue;
+      }
+
+      // Regular text
+      if (cleanLine) {
+        doc.fontSize(10).font('Helvetica').fillColor('#5a4a42').text(cleanLine, { width: 480 });
+        doc.moveDown(0.3);
+      }
+    }
+
+    // Footer
+    doc.moveDown(2);
+    doc.moveTo(30, doc.y).lineTo(570, doc.y).stroke('#e0d5ca');
+    doc.moveDown(1);
+    doc.fontSize(9).fillColor('#8C7A68').text('Generated with ❤️ by Tail Prep • tailprep.com', { align: 'center' });
 
     doc.end();
   });
@@ -155,17 +199,20 @@ function generatePDF(mealPlanText, quizData) {
 // Main endpoint
 app.post('/api/generate-plan', async (req, res) => {
   try {
-    const quizData = req.body;
+    const { quizData, mealPlanText } = req.body;
 
     // Validate required fields
-    if (!quizData.name || !quizData.size || !quizData.activity || !quizData.goal || !quizData.protein) {
+    if (!quizData || !quizData.name || !quizData.size || !quizData.activity || !quizData.goal || !quizData.protein) {
       return res.status(400).json({ error: 'Missing required quiz data' });
     }
 
     console.log('Generating meal plan for:', quizData.name);
 
-    // Generate meal plan with Claude
-    const mealPlan = await generateMealPlan(quizData);
+    // If mealPlanText is provided, skip Claude generation (for fast downloads)
+    let mealPlan = mealPlanText;
+    if (!mealPlan) {
+      mealPlan = await generateMealPlan(quizData);
+    }
 
     // Generate PDF
     const pdfBuffer = await generatePDF(mealPlan, quizData);
