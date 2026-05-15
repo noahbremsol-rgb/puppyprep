@@ -250,8 +250,8 @@ app.post('/api/create-checkout', async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: 'https://tailprep.netlify.app/?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'https://tailprep.netlify.app/',
+      success_url: 'https://tailprep.com/?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://tailprep.com/',
     });
 
     res.json({ url: session.url, sessionId: session.id });
