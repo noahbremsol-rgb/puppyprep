@@ -603,6 +603,77 @@
                 margin-bottom: 35px;
             }
         }
+
+        /* CAROUSEL STYLES */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-out;
+            touch-action: pan-y;
+        }
+
+        .carousel-slide {
+            flex: 0 0 100%;
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 20px;
+        }
+
+        .carousel-slide img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            padding: 0;
+            font-size: 0;
+        }
+
+        .carousel-dot.active {
+            background: #635bff;
+            width: 28px;
+            border-radius: 5px;
+        }
+
+        .carousel-dot:hover {
+            background: #999;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-slide img {
+                max-height: 60vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -703,6 +774,7 @@
                 <div class="step" id="step3">3</div>
                 <div class="step" id="step4">4</div>
                 <div class="step" id="step5">5</div>
+                <div class="step" id="step6">6</div>
             </div>
 
             <!-- Step 1: Dog Name & Breed -->
@@ -849,8 +921,29 @@
                 </div>
             </div>
 
-            <!-- Step 5: Review -->
+            <!-- Step 5: Cooking Effort -->
             <div class="quiz-step hidden" id="step-5">
+                <h2 class="section-title">Cooking Effort & Time ⏰</h2>
+                <p class="section-subtitle">Some recipes are quick & simple. Others require more prep. What works for your schedule?</p>
+
+                <div class="form-group">
+                    <label for="cookingEffort">Preferred Cooking Effort</label>
+                    <select id="cookingEffort" required>
+                        <option value="">Select cooking effort...</option>
+                        <option value="Quick & Easy">Quick & Easy (Under 15 min per meal)</option>
+                        <option value="Moderate">Moderate (15-30 min per meal)</option>
+                        <option value="Involved">Involved (30+ min, but rewarding)</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="prevStep(5)">Back</button>
+                    <button class="btn-primary" onclick="nextStep(5)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Review -->
+            <div class="quiz-step hidden" id="step-6">
                 <h2 class="section-title">Review Your Answers ✓</h2>
                 <p class="section-subtitle">Almost there! Let's make sure everything looks paws-itively perfect before we cook up their plan.</p>
 
@@ -864,10 +957,11 @@
                     <p><strong>Allergies:</strong> <span id="review-allergies"></span></p>
                     <p><strong>Protein:</strong> <span id="review-protein"></span></p>
                     <p><strong>Budget:</strong> <span id="review-budget"></span></p>
+                    <p><strong>Cooking Effort:</strong> <span id="review-cookingEffort"></span></p>
                 </div>
 
                 <div class="button-group">
-                    <button class="btn-secondary" onclick="prevStep(5)">Back</button>
+                    <button class="btn-secondary" onclick="prevStep(6)">Back</button>
                     <button class="btn-primary" id="generateBtn" onclick="generatePlan()">Generate My Plan</button>
                 </div>
             </div>
@@ -925,7 +1019,7 @@
             </div>
         </div>
 
-        <!-- Full Plan Display -->
+        <!-- Full Plan Display - CAROUSEL -->
         <div class="card hidden" id="fullPlanCard">
             <div style="padding: 0;">
                 <div style="background: linear-gradient(135deg, #635bff 0%, #8C7A68 100%); text-align: center; padding: 50px 30px; border-bottom: none;">
@@ -935,11 +1029,29 @@
                     <p style="color: rgba(255,255,255,0.8); margin-top: 15px; font-size: 13px; letter-spacing: 0.5px; font-weight: 500;">Powered by Tail Prep 🐾</p>
                 </div>
 
-                <div id="fullPlanContent" style="padding: 40px; max-height: 70vh; overflow-y: auto; color: #5a4a42; line-height: 1.8; font-size: 15px;"></div>
+                <!-- CAROUSEL SECTION -->
+                <div style="padding: 30px 20px; background: #f9f7f5; min-height: 80vh; display: flex; flex-direction: column; justify-content: center;">
+                    <!-- Carousel Container -->
+                    <div class="carousel-container">
+                        <div class="carousel-track" id="carouselTrack">
+                            <!-- Images loaded dynamically here -->
+                        </div>
+                    </div>
+
+                    <!-- Navigation Dots -->
+                    <div class="carousel-dots" id="carouselDots"></div>
+
+                    <!-- Download Button -->
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="btn-primary" onclick="downloadCurrentImage()" style="padding: 14px 32px; font-size: 16px;">
+                            📥 Save Image to Photos
+                        </button>
+                    </div>
+                </div>
 
                 <div class="button-group" style="padding: 30px; border-top: 2px solid #e0d5ca;">
                     <button class="btn-secondary" onclick="localStorage.removeItem('quizStarted'); location.href='/'">Create Another Plan</button>
-                    <button class="btn-primary stripe-button" onclick="downloadPlanPDF()" style="font-size: 16px;">📥 Download as PDF</button>
+                    <button class="btn-primary" onclick="downloadAllImages()" style="font-size: 16px;">⬇️ Download All as ZIP</button>
                 </div>
             </div>
         </div>
@@ -1196,7 +1308,7 @@
         });
 
         function updateProgressBar(step) {
-            const progressPercentage = (step / 5) * 100;
+            const progressPercentage = (step / 6) * 100;
             document.getElementById('progressFill').style.width = progressPercentage + '%';
         }
 
@@ -1240,7 +1352,7 @@
             updateProgressBar(step + 1);
 
             // If moving to review, populate review data
-            if (step === 4) {
+            if (step === 5) {
                 populateReview();
             }
         }
@@ -1294,6 +1406,12 @@
                     showError('budget', '💰 Please select a budget');
                     return false;
                 }
+            } else if (step === 5) {
+                const cookingEffort = document.getElementById('cookingEffort').value;
+                if (!cookingEffort) {
+                    showError('cookingEffort', '⏰ Please select a cooking effort level');
+                    return false;
+                }
             }
             return true;
         }
@@ -1317,6 +1435,8 @@
             } else if (step === 4) {
                 currentData.protein = document.getElementById('protein').value;
                 currentData.budget = document.getElementById('budget').value;
+            } else if (step === 5) {
+                currentData.cookingEffort = document.getElementById('cookingEffort').value;
             }
         }
 
@@ -1330,6 +1450,7 @@
             document.getElementById('review-allergies').textContent = currentData.allergies || 'None';
             document.getElementById('review-protein').textContent = currentData.protein || '';
             document.getElementById('review-budget').textContent = currentData.budget || '';
+            document.getElementById('review-cookingEffort').textContent = currentData.cookingEffort || '';
         }
 
         async function generatePlan() {
@@ -1350,7 +1471,7 @@
                 const response = await fetch('https://puppyprep-production.up.railway.app/api/generate-plan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(currentData)
+                    body: JSON.stringify({ quizData: currentData })
                 });
 
                 console.log('Response received:', response.status);
@@ -1548,6 +1669,7 @@
                         window.stripeSessionId = sessionId;
 
                         // Show email confirmation screen
+                        document.getElementById('landingPage').classList.add('hidden');
                         document.getElementById('quizCard').classList.add('hidden');
                         document.getElementById('loadingCard').classList.add('hidden');
                         document.getElementById('resultsCard').classList.add('hidden');
@@ -1586,8 +1708,15 @@
                 return response.json();
             })
             .then(data => {
-                generatedMealPlan = data.mealPlan;
-                window.fullMealPlan = data.mealPlan;
+                // Store image data or fallback to meal plan text
+                if (data.images && data.imageFiles) {
+                    window.generatedImages = data.images;
+                    window.generatedImageFiles = data.imageFiles;
+                    generatedMealPlan = 'CAROUSEL'; // Mark that we have carousel data
+                } else if (data.mealPlan) {
+                    generatedMealPlan = data.mealPlan;
+                }
+                window.fullMealPlan = data;
                 return data;
             })
             .catch(error => {
@@ -1637,7 +1766,6 @@
 
             // If plan is already generated, show it immediately
             if (generatedMealPlan) {
-                // Trigger confetti and show plan immediately
                 displayFullPlan(generatedMealPlan, email);
                 triggerConfetti();
                 return;
@@ -1661,12 +1789,12 @@
 
                 clearInterval(punInterval);
 
-                if (!data || !data.mealPlan) {
+                if (!data) {
                     throw new Error('Failed to generate plan');
                 }
 
-                // Show full plan screen
-                displayFullPlan(data.mealPlan, email);
+                // Show full plan screen (handles both carousel and text formats)
+                displayFullPlan(data, email);
 
                 // Trigger confetti after plan is displayed
                 triggerConfetti();
@@ -1680,102 +1808,17 @@
             }
         }
 
-        function displayFullPlan(mealPlanText, email) {
+        function displayFullPlan(data, email) {
             document.getElementById('emailConfirmMsg').textContent = `✉️ A copy has been sent to ${email}`;
 
-            // Parse and format meal plan with beautiful sections and colors
-            const lines = mealPlanText.split('\n');
-            let formattedPlan = '';
-            let currentSectionTitle = '';
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-
-                if (!line.trim()) {
-                    continue;
-                }
-
-                // Handle main section headers
-                if (line.match(/^#+\s/)) {
-                    const cleanLine = line.replace(/^#+\s+/, '').trim();
-
-                    // Major section headers
-                    const majorSections = ['SUMMARY', 'DAILY CALORIC NEEDS', 'WEEKLY SHOPPING LIST', 'STORAGE & MEAL PREP TIPS', 'CONSIDERATIONS', 'HELPFUL NOTES', 'DAILY PORTIONS', '1-WEEK MEAL PREP'];
-
-                    if (majorSections.some(s => cleanLine.includes(s))) {
-                        currentSectionTitle = cleanLine;
-                        // Rename "HELPFUL NOTES" to "CONSIDERATIONS"
-                        const displayTitle = cleanLine.replace('HELPFUL NOTES', 'CONSIDERATIONS');
-                        formattedPlan += `
-                            <div style="background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
-                                       padding: 18px 20px;
-                                       margin: 30px 0 20px 0;
-                                       border-radius: 10px;
-                                       box-shadow: 0 4px 15px rgba(76, 175, 80, 0.15);">
-                                <h2 style="color: white; font-size: 18px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">
-                                    ${displayTitle}
-                                </h2>
-                            </div>
-                        `;
-                    } else if (line.startsWith('###')) {
-                        formattedPlan += `<h4 style="color: #4CAF50; margin-top: 15px; margin-bottom: 10px; font-weight: 700; font-size: 14px; letter-spacing: 0.2px;">${cleanLine}</h4>`;
-                    }
-                    continue;
-                }
-
-                // All-caps headers (like MONDAY, TUESDAY, etc)
-                if (line.match(/^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)/)) {
-                    const dayName = line.split('\n')[0];
-                    formattedPlan += `
-                        <div style="background: linear-gradient(135deg, #d4a574 0%, #c4944a 100%);
-                                   padding: 12px 16px;
-                                   margin: 20px 0 12px 0;
-                                   border-radius: 6px;
-                                   display: inline-block;">
-                            <h3 style="color: white; font-weight: 700; font-size: 14px; margin: 0; letter-spacing: 0.3px;">
-                                ${dayName}
-                            </h3>
-                        </div>
-                    `;
-                    continue;
-                }
-
-                // Clean up **text** formatting and remove table pipes
-                let cleanedLine = line.replace(/\*\*/g, '').replace(/\|/g, '').trim();
-
-                // Skip empty lines and table separators
-                if (!cleanedLine || cleanedLine.match(/^-+\s*$/)) continue;
-
-                // Ingredients/Preparation headers
-                if (cleanedLine.match(/^(Ingredients|Preparation):/i)) {
-                    formattedPlan += `<p style="color: #4CAF50; font-weight: 700; font-size: 13px; margin: 12px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">${cleanedLine}</p>`;
-                    continue;
-                }
-
-                // Bullet points and numbered lists
-                if (line.match(/^[\d+\.\-•\s]/)) {
-                    formattedPlan += `<div style="margin-left: 20px; font-size: 13px; line-height: 1.8; color: #5a4a42; margin-bottom: 6px;">${cleanedLine}</div>`;
-                    continue;
-                }
-
-                // Regular paragraphs
-                if (cleanedLine.trim()) {
-                    formattedPlan += `<p style="margin: 10px 0; font-size: 13px; line-height: 1.8; color: #5a4a42;">${cleanedLine}</p>`;
-                }
+            // Check if we have carousel image data
+            if (data && data.images && data.imageFiles) {
+                // Initialize carousel with image data
+                initCarousel(data.images, data.imageFiles);
+            } else {
+                // Fallback to text mode (if neither images nor mealPlan)
+                console.log('No image data found, would render text (deprecated)');
             }
-
-            // Add bottom branding
-            formattedPlan += `
-                <div style="margin-top: 40px; padding-top: 25px; border-top: 2px solid #e0d5ca; text-align: right;">
-                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                        <span style="font-size: 18px;">🐾</span>
-                        <span style="color: #4CAF50; font-size: 14px; font-weight: 700; letter-spacing: 1px;">TAIL PREP</span>
-                    </div>
-                    <p style="color: #8C7A68; font-size: 11px; margin: 8px 0 0 0; font-style: italic;">Personalized nutrition for your pup</p>
-                </div>
-            `;
-
-            document.getElementById('fullPlanContent').innerHTML = formattedPlan;
 
             // Hide loading, show full plan
             document.getElementById('finalizingCard').classList.add('hidden');
@@ -1786,6 +1829,134 @@
 
             // Clear localStorage
             localStorage.removeItem('puppyPlansData');
+        }
+
+        // CAROUSEL FUNCTIONS
+        let carouselState = {
+            currentIndex: 0,
+            images: {},
+            imageFiles: []
+        };
+
+        function initCarousel(images, imageFiles) {
+            carouselState.images = images;
+            carouselState.imageFiles = imageFiles.sort();
+            carouselState.currentIndex = 0;
+
+            const track = document.getElementById('carouselTrack');
+            const dotsContainer = document.getElementById('carouselDots');
+
+            track.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            // Create slides
+            imageFiles.sort().forEach((filename, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'carousel-slide';
+                const img = document.createElement('img');
+                img.src = `data:image/png;base64,${images[filename]}`;
+                img.alt = filename;
+                slide.appendChild(img);
+                track.appendChild(slide);
+
+                // Create dot
+                const dot = document.createElement('button');
+                dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(index);
+                dot.setAttribute('aria-label', `Go to image ${index + 1}`);
+                dotsContainer.appendChild(dot);
+            });
+
+            // Touch/swipe support
+            let touchStartX = 0;
+            track.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+
+            track.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                if (touchStartX - touchEndX > 50) {
+                    nextSlide();
+                } else if (touchEndX - touchStartX > 50) {
+                    prevSlide();
+                }
+            }, { passive: true });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') prevSlide();
+                if (e.key === 'ArrowRight') nextSlide();
+            });
+        }
+
+        function updateCarousel() {
+            const track = document.getElementById('carouselTrack');
+            const offset = carouselState.currentIndex * -100;
+            track.style.transform = `translateX(${offset}%)`;
+
+            // Update dots
+            document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === carouselState.currentIndex);
+            });
+        }
+
+        function goToSlide(index) {
+            carouselState.currentIndex = index;
+            updateCarousel();
+        }
+
+        function nextSlide() {
+            carouselState.currentIndex = (carouselState.currentIndex + 1) % carouselState.imageFiles.length;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            carouselState.currentIndex = (carouselState.currentIndex - 1 + carouselState.imageFiles.length) % carouselState.imageFiles.length;
+            updateCarousel();
+        }
+
+        function downloadCurrentImage() {
+            const filename = carouselState.imageFiles[carouselState.currentIndex];
+            const imageData = carouselState.images[filename];
+
+            if (!imageData) {
+                alert('Image data not found');
+                return;
+            }
+
+            // Create blob from base64
+            const binaryString = atob(imageData);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([bytes], { type: 'image/png' });
+
+            // Try native share API first (best for iOS)
+            if (navigator.canShare && navigator.canShare({ files: [new File([blob], filename, { type: 'image/png' })] })) {
+                navigator.share({
+                    files: [new File([blob], filename, { type: 'image/png' })],
+                    title: 'Meal Plan Image'
+                }).catch(err => {
+                    if (err.name !== 'AbortError') {
+                        console.log('Share error:', err);
+                    }
+                });
+            } else {
+                // Fallback: download
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename.replace('.png', '-meal-plan.png');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function downloadAllImages() {
+            alert('ZIP download coming soon! For now, use the "Save Image to Photos" button to download individual images.');
         }
 
         function downloadPlanPDF() {

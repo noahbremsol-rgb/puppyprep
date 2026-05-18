@@ -4,6 +4,10 @@ const PDFDocument = require('pdfkit');
 const cors = require('cors');
 const Stripe = require('stripe');
 const { Resend } = require('resend');
+const { execFile } = require('child_process');
+const path = require('path');
+const fs = require('fs');
+const { parseMealPlan } = require('./mealParser');
 
 const app = express();
 app.use(express.json());
@@ -12,6 +16,12 @@ app.use(cors());
 const client = new Anthropic();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
+const IMAGES_OUTPUT_DIR = path.join(__dirname, 'generated_images');
+
+// Ensure output directory exists
+if (!fs.existsSync(IMAGES_OUTPUT_DIR)) {
+  fs.mkdirSync(IMAGES_OUTPUT_DIR, { recursive: true });
+}
 
 // Generate meal plan using Claude
 async function generateMealPlan(quizData) {
@@ -28,8 +38,14 @@ DOG INFORMATION:
 - Allergies/Restrictions: ${quizData.allergies || 'None'}
 - Preferred Protein: ${quizData.protein}
 - Budget: ${quizData.budget}
+- Cooking Effort Level: ${quizData.cookingEffort || 'Moderate'}
 
-Create a personalized 1-week meal prep plan. Format your response EXACTLY like this (be concise and professional):
+Create a personalized 1-week meal prep plan tailored to their cooking effort level:
+- Quick & Easy: Simple recipes under 15 minutes, minimal prep, few ingredients
+- Moderate: Balanced recipes 15-30 minutes, some prep involved
+- Involved: More complex recipes 30+ minutes, multiple steps, richer meals
+
+Format your response EXACTLY like this (be concise and professional):
 
 ## SUMMARY
 Write 2-3 sentences explaining why this plan works for ${quizData.name} (${quizData.gender || 'gender not specified'}, ${quizData.weight || 'weight not specified'} lbs) based on their profile.
@@ -110,6 +126,101 @@ Any breed-specific or age-specific considerations that matter.`;
     console.error('Error status:', error.status);
     throw error;
   }
+}
+
+// Generate PNG images from meal plan
+async function generatePNGImages(mealPlanText, quizData) {
+  return new Promise((resolve, reject) => {
+    try {
+      // Parse the meal plan into structured data
+      const parsedMeals = parseMealPlan(mealPlanText, quizData);
+      if (!parsedMeals || !parsedMeals.parsed) {
+        return reject(new Error('Failed to parse meal plan'));
+      }
+
+      // Create a unique folder for this user's images
+      const userImageDir = path.join(IMAGES_OUTPUT_DIR, `${quizData.name}-${Date.now()}`);
+      if (!fs.existsSync(userImageDir)) {
+        fs.mkdirSync(userImageDir, { recursive: true });
+      }
+
+      // Prepare data for Python script
+      const dogProfile = {
+        name: parsedMeals.dogName,
+        breed: parsedMeals.breed,
+        size: parsedMeals.size,
+        age: parsedMeals.age,
+        weight: parsedMeals.weight,
+        goal: parsedMeals.goal,
+        activity: parsedMeals.activity,
+        cookingEffort: parsedMeals.cookingEffort
+      };
+
+      // Estimate ingredient prices (can be enhanced later)
+      const ingredientPrices = {};
+      parsedMeals.shoppingList.forEach(item => {
+        if (!ingredientPrices[item]) {
+          if (item.toLowerCase().includes('chicken') || item.toLowerCase().includes('turkey')) {
+            ingredientPrices[item] = '$8.99';
+          } else if (item.toLowerCase().includes('salmon')) {
+            ingredientPrices[item] = '$13.99';
+          } else if (item.toLowerCase().includes('potato') || item.toLowerCase().includes('berry')) {
+            ingredientPrices[item] = '$4.99';
+          } else {
+            ingredientPrices[item] = '$3.99';
+          }
+        }
+      });
+
+      // Call Python script
+      const pythonScript = path.join(__dirname, 'generate_meal_images.py');
+      const args = [
+        pythonScript,
+        userImageDir,
+        JSON.stringify(dogProfile),
+        JSON.stringify(parsedMeals.meals),
+        JSON.stringify(ingredientPrices)
+      ];
+
+      console.log('Calling Python PNG generator...');
+      execFile('python3', args, { timeout: 120000 }, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Python execution error:', error);
+          console.error('stderr:', stderr);
+          return reject(error);
+        }
+
+        console.log('Python output:', stdout);
+
+        // Read generated image files
+        fs.readdir(userImageDir, (err, files) => {
+          if (err) return reject(err);
+
+          const imageFiles = files.filter(f => f.endsWith('.png')).sort();
+          const images = {};
+
+          imageFiles.forEach(file => {
+            const filePath = path.join(userImageDir, file);
+            try {
+              const imageBuffer = fs.readFileSync(filePath);
+              images[file] = imageBuffer.toString('base64');
+            } catch (e) {
+              console.error(`Error reading ${file}:`, e);
+            }
+          });
+
+          resolve({
+            images,
+            imageDir: userImageDir,
+            imageFiles: imageFiles,
+            parsed: parsedMeals
+          });
+        });
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 // Generate PDF from meal plan
@@ -196,7 +307,7 @@ function generatePDF(mealPlanText, quizData) {
   });
 }
 
-// Main endpoint
+// Main endpoint - Generate meal plan (for preview)
 app.post('/api/generate-plan', async (req, res) => {
   try {
     const { quizData, mealPlanText } = req.body;
@@ -214,14 +325,17 @@ app.post('/api/generate-plan', async (req, res) => {
       mealPlan = await generateMealPlan(quizData);
     }
 
-    // Generate PDF
-    const pdfBuffer = await generatePDF(mealPlan, quizData);
+    // Start PNG generation in background (don't wait)
+    generatePNGImages(mealPlan, quizData).catch(err => {
+      console.error('Background PNG generation error:', err);
+    });
 
-    // Send PDF
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${quizData.name}-Meal-Plan.pdf"`);
-    res.setHeader('Content-Length', pdfBuffer.length);
-    res.send(pdfBuffer);
+    // Send meal plan text for preview
+    res.json({
+      success: true,
+      mealPlan: mealPlan,
+      quizData: quizData
+    });
 
   } catch (error) {
     console.error('Error:', error);
@@ -285,7 +399,7 @@ app.get('/api/session-email', async (req, res) => {
   }
 });
 
-// Finalize purchase: Generate full plan, create PDF, send email
+// Finalize purchase: Generate PNG images, send email with images
 app.post('/api/finalize-purchase', async (req, res) => {
   try {
     const { sessionId, email, quizData } = req.body;
@@ -305,37 +419,44 @@ app.post('/api/finalize-purchase', async (req, res) => {
     // Generate full meal plan
     const mealPlan = await generateMealPlan(quizData);
 
-    // Generate PDF
-    const pdfBuffer = await generatePDF(mealPlan, quizData);
+    // Generate PNG images
+    const pngResult = await generatePNGImages(mealPlan, quizData);
 
-    // Send email with PDF
+    // Send email with images as attachments
+    const attachments = Object.entries(pngResult.images).map(([filename, base64]) => ({
+      filename: filename,
+      content: Buffer.from(base64, 'base64')
+    }));
+
     const emailResponse = await resend.emails.send({
-      from: 'Tail Prep <onboarding@resend.dev>', // Update this email
+      from: 'Tail Prep <onboarding@resend.dev>',
       to: email,
-      subject: `${quizData.name}'s Personalized 1-Week Meal Plan`,
+      subject: `🐕 ${quizData.name}'s Personalized 1-Week Meal Plan is Ready!`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1>🐕 ${quizData.name}'s Meal Plan is Ready!</h1>
           <p>Hi there!</p>
-          <p>Your personalized 1-week meal prep plan for <strong>${quizData.name}</strong> is attached as a PDF.</p>
-          <p><strong>Plan Summary:</strong></p>
+          <p>Your personalized 1-week meal prep plan for <strong>${quizData.name}</strong> is ready! Your plan includes:</p>
+          <ul>
+            <li>📋 Complete shopping list with prices</li>
+            <li>🍽️ 7 days of customized meals (morning + evening)</li>
+            <li>👨‍🍳 Step-by-step cooking instructions</li>
+            <li>📊 Calorie counts and macros</li>
+            <li>💡 Nutritional information & what to expect</li>
+          </ul>
+          <p><strong>Dog Profile:</strong></p>
           <ul>
             <li>Breed: ${quizData.breed}</li>
             <li>Size: ${quizData.size}</li>
             <li>Activity Level: ${quizData.activity}</li>
-            <li>Health Goal: ${quizData.goal}</li>
+            <li>Goal: ${quizData.goal}</li>
           </ul>
-          <p>Open the PDF to see the complete 7-day meal schedule, shopping list, prep instructions, and more!</p>
+          <p>Your meal plan images are attached below. Save them to your phone, share with your vet, or keep them handy in the kitchen!</p>
           <p>Happy meal prepping! 🐾</p>
           <p>- Tail Prep Team</p>
         </div>
       `,
-      attachments: [
-        {
-          filename: `${quizData.name}-Meal-Plan.pdf`,
-          content: pdfBuffer.toString('base64')
-        }
-      ]
+      attachments: attachments
     });
 
     if (!emailResponse.data?.id) {
@@ -345,11 +466,13 @@ app.post('/api/finalize-purchase', async (req, res) => {
 
     console.log('Email sent successfully:', emailResponse.data.id);
 
-    // Return full plan for display on page
+    // Return images for carousel display
     res.json({
       success: true,
-      mealPlan: mealPlan,
-      message: `Meal plan emailed to ${email}!`
+      images: pngResult.images,
+      imageFiles: pngResult.imageFiles,
+      parsed: pngResult.parsed,
+      message: `Meal plan sent to ${email}!`
     });
 
   } catch (error) {
