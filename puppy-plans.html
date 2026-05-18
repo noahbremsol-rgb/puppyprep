@@ -815,6 +815,16 @@
                 <p class="section-subtitle">Is your pup a couch potato or a furry athlete? Either way, we've got the perfect meal plan!</p>
 
                 <div class="form-group">
+                    <label for="dogAge">Age</label>
+                    <select id="dogAge" required>
+                        <option value="">Select age...</option>
+                        <option value="Puppy (0-1 year)">Puppy (0-1 year)</option>
+                        <option value="Adult (1-7 years)">Adult (1-7 years)</option>
+                        <option value="Senior (7+ years)">Senior (7+ years)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="dogSize">Dog Size</label>
                     <select id="dogSize" required>
                         <option value="">Select size...</option>
@@ -951,6 +961,7 @@
                     <p><strong>Name:</strong> <span id="review-name"></span></p>
                     <p><strong>Breed:</strong> <span id="review-breed"></span></p>
                     <p><strong>Gender:</strong> <span id="review-gender"></span></p>
+                    <p><strong>Age:</strong> <span id="review-age"></span></p>
                     <p><strong>Size:</strong> <span id="review-size"></span></p>
                     <p><strong>Activity Level:</strong> <span id="review-activity"></span></p>
                     <p><strong>Health Goal:</strong> <span id="review-goal"></span></p>
@@ -1379,8 +1390,13 @@
                     return false;
                 }
             } else if (step === 2) {
+                const age = document.getElementById('dogAge').value;
                 const size = document.getElementById('dogSize').value;
                 const activity = document.getElementById('activity').value;
+                if (!age) {
+                    showError('dogAge', '🎂 Please select an age');
+                    return false;
+                }
                 if (!size) {
                     showError('dogSize', '📏 Please select a size');
                     return false;
@@ -1422,6 +1438,7 @@
                 currentData.breed = document.getElementById('dogBreed').value.trim();
                 currentData.gender = document.getElementById('dogGender').value;
             } else if (step === 2) {
+                currentData.age = document.getElementById('dogAge').value;
                 currentData.size = document.getElementById('dogSize').value;
                 currentData.weight = document.getElementById('dogWeight').value || '';
                 currentData.activity = document.getElementById('activity').value;
@@ -1444,6 +1461,7 @@
             document.getElementById('review-name').textContent = currentData.name || '';
             document.getElementById('review-breed').textContent = currentData.breed || '';
             document.getElementById('review-gender').textContent = currentData.gender || '';
+            document.getElementById('review-age').textContent = currentData.age || '';
             document.getElementById('review-size').textContent = currentData.size || '';
             document.getElementById('review-activity').textContent = currentData.activity || '';
             document.getElementById('review-goal').textContent = currentData.goal || '';
