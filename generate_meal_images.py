@@ -170,15 +170,15 @@ def generate_daily_meal(output_dir, dog_profile, day_name, meal_data, day_num):
     draw.text((WIDTH//2, y), f"{dog_profile['name']}'s Personalized Meal Plan", anchor="mm", font=fonts['small'], fill=VIBRANT_TEAL)
     y += 70
 
-    # MORNING MEAL
+    # DAILY MEAL
     draw.rectangle([(20, y), (WIDTH-20, y+75)], fill=VIBRANT_GREEN)
-    draw.text((WIDTH//2, y+37), "🌅 MORNING MEAL", anchor="mm", font=fonts['section'], fill=DARK_TEXT)
+    draw.text((WIDTH//2, y+37), "🍽️ DAILY MEAL", anchor="mm", font=fonts['section'], fill=DARK_TEXT)
     y += 95
 
     # Calories & macros
     draw.rectangle([(30, y), (WIDTH-30, y+100)], fill=VIBRANT_PINK)
-    draw.text((70, y+20), f"{meal_data['morning']['calories']} CAL", anchor="lm", font=fonts['section'], fill=WHITE_TEXT)
-    draw.text((70, y+60), meal_data['morning']['macros'], anchor="lm", font=fonts['item'], fill=WHITE_TEXT)
+    draw.text((70, y+20), f"{meal_data['calories']} CAL", anchor="lm", font=fonts['section'], fill=WHITE_TEXT)
+    draw.text((70, y+60), meal_data['macros'], anchor="lm", font=fonts['item'], fill=WHITE_TEXT)
     y += 120
 
     # Ingredients
@@ -186,7 +186,7 @@ def generate_daily_meal(output_dir, dog_profile, day_name, meal_data, day_num):
     draw.text((WIDTH//2, y+32), "📍 INGREDIENTS", anchor="mm", font=fonts['section'], fill=DARK_TEXT)
     y += 85
 
-    for ingredient in meal_data['morning']['ingredients']:
+    for ingredient in meal_data['ingredients']:
         draw.text((70, y), f"• {ingredient}", font=fonts['item'], fill=WHITE_TEXT)
         y += 38
 
@@ -197,49 +197,14 @@ def generate_daily_meal(output_dir, dog_profile, day_name, meal_data, day_num):
     draw.text((WIDTH//2, y+32), "👨‍🍳 HOW TO PREPARE", anchor="mm", font=fonts['section'], fill=WHITE_TEXT)
     y += 85
 
-    for i, step in enumerate(meal_data['morning']['steps'], 1):
+    for i, step in enumerate(meal_data['steps'], 1):
         draw.text((70, y), f"{i}. {step}", font=fonts['item'], fill=WHITE_TEXT)
         y += 38
 
     # Time
     draw.rectangle([(30, y+10), (WIDTH-30, y+60)], fill=VIBRANT_TEAL)
-    draw.text((WIDTH//2, y+35), f"⏱️  {meal_data['morning']['time']}", anchor="mm", font=fonts['section'], fill=DARK_TEXT)
+    draw.text((WIDTH//2, y+35), f"⏱️  {meal_data['time']}", anchor="mm", font=fonts['section'], fill=DARK_TEXT)
     y += 90
-
-    # EVENING MEAL
-    draw.rectangle([(20, y), (WIDTH-20, y+75)], fill=VIBRANT_ORANGE)
-    draw.text((WIDTH//2, y+37), "🌙 EVENING MEAL", anchor="mm", font=fonts['section'], fill=DARK_TEXT)
-    y += 95
-
-    # Calories & macros
-    draw.rectangle([(30, y), (WIDTH-30, y+100)], fill=VIBRANT_TEAL)
-    draw.text((70, y+20), f"{meal_data['evening']['calories']} CAL", anchor="lm", font=fonts['section'], fill=DARK_TEXT)
-    draw.text((70, y+60), meal_data['evening']['macros'], anchor="lm", font=fonts['item'], fill=DARK_TEXT)
-    y += 120
-
-    # Ingredients
-    draw.rectangle([(20, y), (WIDTH-20, y+65)], fill=VIBRANT_GREEN)
-    draw.text((WIDTH//2, y+32), "📍 INGREDIENTS", anchor="mm", font=fonts['section'], fill=DARK_TEXT)
-    y += 85
-
-    for ingredient in meal_data['evening']['ingredients']:
-        draw.text((70, y), f"• {ingredient}", font=fonts['item'], fill=WHITE_TEXT)
-        y += 38
-
-    y += 15
-
-    # Steps
-    draw.rectangle([(20, y), (WIDTH-20, y+65)], fill=VIBRANT_PINK)
-    draw.text((WIDTH//2, y+32), "👨‍🍳 HOW TO PREPARE", anchor="mm", font=fonts['section'], fill=WHITE_TEXT)
-    y += 85
-
-    for i, step in enumerate(meal_data['evening']['steps'], 1):
-        draw.text((70, y), f"{i}. {step}", font=fonts['item'], fill=WHITE_TEXT)
-        y += 38
-
-    # Time
-    draw.rectangle([(30, y+10), (WIDTH-30, y+60)], fill=VIBRANT_PURPLE)
-    draw.text((WIDTH//2, y+35), f"⏱️  {meal_data['evening']['time']}", anchor="mm", font=fonts['section'], fill=WHITE_TEXT)
 
     # Footer
     draw.text((WIDTH//2, HEIGHT-50), "Tail Prep • tailprep.com", anchor="mm", font=fonts['small'], fill=VIBRANT_TEAL)
