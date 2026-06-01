@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 """
-Generate professional meal plan PNG images for Tail Prep.
-Clean, readable design matching the quiz aesthetic.
+Generate clean, readable meal plan PNG images for Tail Prep.
+No emojis. Full-page layout. Professional design.
 """
 
 import sys
 import json
 from PIL import Image, ImageDraw, ImageFont
 
-# WARM, PROFESSIONAL COLOR PALETTE (matches quiz)
+# COLOR PALETTE
 CREAM_BG = "#F5E6D3"
 DARK_TEXT = "#5A4A42"
 ACCENT_TEAL = "#4DA6A6"
 ACCENT_WARM = "#C99A6E"
 WHITE_BG = "#FFFFFF"
 LIGHT_GRAY = "#E8D4C0"
-SECTION_BG = "#F9F7F5"
 
 WIDTH = 1080
 HEIGHT = 1920
@@ -24,12 +23,12 @@ def get_fonts():
     """Load fonts with fallback"""
     try:
         fonts = {
-            'hero': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 72),
-            'title': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 48),
-            'section': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40),
-            'subsection': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 32),
-            'body': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28),
-            'small': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24),
+            'hero': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 64),
+            'title': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 44),
+            'section': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36),
+            'subsection': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 30),
+            'body': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 26),
+            'small': ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 22),
         }
     except:
         default = ImageFont.load_default()
@@ -37,7 +36,7 @@ def get_fonts():
     return fonts
 
 def generate_shopping_list(output_dir, dog_profile, shopping_items, ingredient_prices):
-    """Generate a beautiful shopping list page"""
+    """Generate shopping list page with actual items"""
     fonts = get_fonts()
     img = Image.new('RGB', (WIDTH, HEIGHT), CREAM_BG)
     draw = ImageDraw.Draw(img)
@@ -45,26 +44,26 @@ def generate_shopping_list(output_dir, dog_profile, shopping_items, ingredient_p
     y = 60
 
     # Header
-    draw.text((WIDTH//2, y), "🐕", anchor="mm", font=fonts['hero'])
-    y += 100
+    draw.text((WIDTH//2, y), dog_profile['name'], anchor="mm", font=fonts['hero'], fill=DARK_TEXT)
+    y += 90
 
-    draw.text((WIDTH//2, y), f"{dog_profile['name']}'s Weekly Meal Plan", anchor="mm", font=fonts['title'], fill=DARK_TEXT)
-    y += 70
+    draw.text((WIDTH//2, y), "Weekly Meal Plan", anchor="mm", font=fonts['title'], fill=DARK_TEXT)
+    y += 60
 
     # Dog info
-    info = f"{dog_profile['breed']} • {dog_profile['size']} • {dog_profile['age']}"
+    info = f"{dog_profile['breed']} - {dog_profile['size']} - {dog_profile['age']}"
     draw.text((WIDTH//2, y), info, anchor="mm", font=fonts['small'], fill=ACCENT_TEAL)
-    y += 60
-
-    # Divider
-    draw.rectangle([(60, y), (WIDTH-60, y+3)], fill=LIGHT_GRAY)
     y += 50
 
-    # SHOPPING LIST TITLE
-    draw.text((60, y), "📋 WEEKLY SHOPPING LIST", font=fonts['section'], fill=DARK_TEXT)
-    y += 60
+    # Divider
+    draw.rectangle([(60, y), (WIDTH-60, y+2)], fill=LIGHT_GRAY)
+    y += 40
 
-    # Organize & display items
+    # SHOPPING LIST TITLE
+    draw.text((60, y), "WEEKLY SHOPPING LIST", font=fonts['section'], fill=DARK_TEXT)
+    y += 55
+
+    # Organize items by category
     categories = {
         'PROTEINS': [],
         'VEGETABLES & CARBS': [],
@@ -80,35 +79,34 @@ def generate_shopping_list(output_dir, dog_profile, shopping_items, ingredient_p
         else:
             categories['SUPPLEMENTS'].append(item)
 
-    # Display categories
-    for category_name, items in categories.items():
+    # Display categories with items
+    for cat_name, items in categories.items():
         if not items:
             continue
 
         # Category header
-        icon = "🥩" if "PROTEIN" in category_name else "🥕" if "VEGET" in category_name else "💊"
-        draw.text((60, y), f"{icon} {category_name}", font=fonts['subsection'], fill=ACCENT_WARM)
-        y += 50
+        draw.text((60, y), cat_name, font=fonts['subsection'], fill=ACCENT_WARM)
+        y += 45
 
         # Items
         for item in items:
-            draw.text((90, y), f"• {item}", font=fonts['body'], fill=DARK_TEXT)
-            y += 45
+            draw.text((90, y), f"- {item}", font=fonts['body'], fill=DARK_TEXT)
+            y += 40
 
-        y += 30
+        y += 20
 
-    # Footer
-    y += 20
+    # Footer with spacing
+    y += 40
     draw.rectangle([(60, y), (WIDTH-60, y+2)], fill=LIGHT_GRAY)
     y += 40
-    draw.text((WIDTH//2, y), "Tail Prep • Personalized Dog Nutrition", anchor="mm", font=fonts['small'], fill=ACCENT_TEAL)
+    draw.text((WIDTH//2, y), "Tail Prep - Personalized Dog Nutrition", anchor="mm", font=fonts['small'], fill=ACCENT_TEAL)
 
     # Save
     img.save(f"{output_dir}/01-Shopping-List.png")
     print("✓ Shopping list generated")
 
 def generate_daily_meal(output_dir, dog_profile, day_name, meal_data, day_num):
-    """Generate a single day's meal image"""
+    """Generate single day meal image"""
     fonts = get_fonts()
     img = Image.new('RGB', (WIDTH, HEIGHT), CREAM_BG)
     draw = ImageDraw.Draw(img)
@@ -116,65 +114,65 @@ def generate_daily_meal(output_dir, dog_profile, day_name, meal_data, day_num):
     y = 60
 
     # Day header
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    day_emoji = "🌅" if day_num <= 3 else "☀️" if day_num <= 5 else "🌙"
-
-    draw.text((WIDTH//2, y), f"{day_emoji} {day_name}", anchor="mm", font=fonts['title'], fill=ACCENT_TEAL)
-    y += 70
-
-    draw.text((WIDTH//2, y), f"{dog_profile['name']}'s Meal", anchor="mm", font=fonts['small'], fill=ACCENT_WARM)
+    draw.text((WIDTH//2, y), day_name, anchor="mm", font=fonts['title'], fill=ACCENT_TEAL)
     y += 60
 
+    draw.text((WIDTH//2, y), dog_profile['name'] + "'s Meal", anchor="mm", font=fonts['small'], fill=ACCENT_WARM)
+    y += 50
+
     # Divider
-    draw.rectangle([(60, y), (WIDTH-60, y+3)], fill=LIGHT_GRAY)
+    draw.rectangle([(60, y), (WIDTH-60, y+2)], fill=LIGHT_GRAY)
+    y += 40
+
+    # NUTRITION
+    draw.text((60, y), "NUTRITION", font=fonts['section'], fill=DARK_TEXT)
     y += 50
 
-    # CALORIES & MACROS
-    draw.text((60, y), "⚡ NUTRITION", font=fonts['section'], fill=DARK_TEXT)
-    y += 50
+    draw.text((90, y), meal_data['calories'] + " Calories", font=fonts['body'], fill=ACCENT_WARM)
+    y += 40
 
-    cal_text = f"{meal_data['calories']} Calories"
-    draw.text((90, y), cal_text, font=fonts['body'], fill=ACCENT_WARM)
-    y += 45
-
-    macro_text = f"Macros: {meal_data['macros']}"
-    draw.text((90, y), macro_text, font=fonts['body'], fill=DARK_TEXT)
+    draw.text((90, y), "Macros: " + meal_data['macros'], font=fonts['body'], fill=DARK_TEXT)
     y += 50
 
     # INGREDIENTS
-    draw.text((60, y), "📍 INGREDIENTS", font=fonts['section'], fill=DARK_TEXT)
+    draw.text((60, y), "INGREDIENTS", font=fonts['section'], fill=DARK_TEXT)
     y += 50
 
     for ingredient in meal_data['ingredients']:
-        # Wrap long ingredients
-        if len(ingredient) > 50:
-            parts = ingredient.split()
+        # Fix fractions and wrap long text
+        ingredient = ingredient.replace('⅓', '1/3').replace('½', '1/2').replace('¾', '3/4')
+
+        if len(ingredient) > 55:
+            words = ingredient.split()
             line1, line2 = "", ""
-            for part in parts:
-                if len(line1 + part) < 45:
-                    line1 += part + " "
+            for word in words:
+                if len(line1 + word) < 50:
+                    line1 += word + " "
                 else:
-                    line2 += part + " "
-            draw.text((90, y), f"• {line1}", font=fonts['body'], fill=DARK_TEXT)
-            y += 40
+                    line2 += word + " "
+            draw.text((90, y), "- " + line1, font=fonts['body'], fill=DARK_TEXT)
+            y += 38
             if line2:
-                draw.text((90, y), f"  {line2}", font=fonts['body'], fill=DARK_TEXT)
-                y += 40
+                draw.text((110, y), line2, font=fonts['body'], fill=DARK_TEXT)
+                y += 38
         else:
-            draw.text((90, y), f"• {ingredient}", font=fonts['body'], fill=DARK_TEXT)
-            y += 40
+            draw.text((90, y), "- " + ingredient, font=fonts['body'], fill=DARK_TEXT)
+            y += 38
 
     y += 20
 
-    # PREPARATION STEPS
-    draw.text((60, y), "👨‍🍳 HOW TO PREPARE", font=fonts['section'], fill=DARK_TEXT)
+    # PREPARATION
+    draw.text((60, y), "PREPARATION", font=fonts['section'], fill=DARK_TEXT)
     y += 50
 
     for i, step in enumerate(meal_data['steps'], 1):
         if step.strip() == "--":
             continue
 
-        # Wrap long steps
+        # Fix fractions
+        step = step.replace('⅓', '1/3').replace('½', '1/2').replace('¾', '3/4')
+
+        # Wrap text
         words = step.split()
         lines = []
         current_line = ""
@@ -188,29 +186,28 @@ def generate_daily_meal(output_dir, dog_profile, day_name, meal_data, day_num):
         if current_line:
             lines.append(current_line)
 
-        # Draw step number and first line
-        draw.text((90, y), f"{i}. {lines[0]}", font=fonts['body'], fill=DARK_TEXT)
-        y += 40
+        # Draw step
+        draw.text((90, y), str(i) + ". " + lines[0], font=fonts['body'], fill=DARK_TEXT)
+        y += 38
 
-        # Draw continuation lines
         for line in lines[1:]:
             draw.text((110, y), line, font=fonts['body'], fill=DARK_TEXT)
-            y += 40
+            y += 38
 
     y += 20
 
     # PREP TIME
-    draw.text((60, y), f"⏱️  Prep Time: {meal_data['time']}", font=fonts['subsection'], fill=ACCENT_TEAL)
+    draw.text((60, y), "Prep Time: " + meal_data['time'], font=fonts['subsection'], fill=ACCENT_TEAL)
     y += 50
 
     # Footer
     draw.rectangle([(60, y+20), (WIDTH-60, y+22)], fill=LIGHT_GRAY)
     y += 60
-    draw.text((WIDTH//2, y), "Tail Prep • Personalized Dog Nutrition", anchor="mm", font=fonts['small'], fill=ACCENT_TEAL)
+    draw.text((WIDTH//2, y), "Tail Prep - Personalized Dog Nutrition", anchor="mm", font=fonts['small'], fill=ACCENT_TEAL)
 
-    # Save with proper numbering
+    # Save
     img.save(f"{output_dir}/{day_num:02d}-{day_name}.png")
-    print(f"✓ {day_name} meal generated")
+    print(f"✓ {day_name} generated")
 
 def main():
     if len(sys.argv) < 4:
@@ -232,7 +229,7 @@ def main():
         if day in meals:
             generate_daily_meal(output_dir, dog_profile, day, meals[day], i)
 
-    print(f"\n✨ All {len(days)+1} images generated successfully!")
+    print(f"\nAll {len(days)+1} images generated!")
 
 if __name__ == '__main__':
     main()
