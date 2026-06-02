@@ -35,7 +35,7 @@ def get_fonts():
         fonts = {k: default for k in fonts.keys()}
     return fonts
 
-def generate_shopping_list(output_dir, dog_profile, shopping_items, ingredient_prices):
+def generate_shopping_list(output_dir, dog_profile, shopping_items, meals, ingredient_prices):
     """Generate shopping list page with actual items"""
     fonts = get_fonts()
     img = Image.new('RGB', (WIDTH, HEIGHT), CREAM_BG)
@@ -63,6 +63,15 @@ def generate_shopping_list(output_dir, dog_profile, shopping_items, ingredient_p
     draw.text((60, y), "WEEKLY SHOPPING LIST", font=fonts['section'], fill=DARK_TEXT)
     y += 55
 
+    # If shopping_items is empty, extract from meals
+    if not shopping_items and isinstance(meals, dict):
+        all_ingredients = set()
+        for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']:
+            if day in meals and 'ingredients' in meals[day]:
+                for ingredient in meals[day]['ingredients']:
+                    all_ingredients.add(ingredient.strip())
+        shopping_items = sorted(list(all_ingredients))
+
     # Organize items by category
     categories = {
         'PROTEINS': [],
@@ -72,9 +81,9 @@ def generate_shopping_list(output_dir, dog_profile, shopping_items, ingredient_p
 
     for item in shopping_items:
         item_lower = item.lower()
-        if any(word in item_lower for word in ['chicken', 'turkey', 'salmon', 'beef', 'meat', 'fish', 'egg']):
+        if any(word in item_lower for word in ['chicken', 'turkey', 'salmon', 'beef', 'meat', 'fish', 'egg', 'pork', 'lamb']):
             categories['PROTEINS'].append(item)
-        elif any(word in item_lower for word in ['potato', 'broccoli', 'carrot', 'bean', 'squash', 'rice', 'grain', 'sweet']):
+        elif any(word in item_lower for word in ['potato', 'broccoli', 'carrot', 'bean', 'squash', 'rice', 'grain', 'sweet', 'pea', 'green bean', 'spinach', 'pumpkin']):
             categories['VEGETABLES & CARBS'].append(item)
         else:
             categories['SUPPLEMENTS'].append(item)
@@ -221,7 +230,7 @@ def main():
     shopping_items = meals.get('shoppingList', [])
 
     # Generate shopping list
-    generate_shopping_list(output_dir, dog_profile, shopping_items, ingredient_prices)
+    generate_shopping_list(output_dir, dog_profile, shopping_items, meals, ingredient_prices)
 
     # Generate daily meals
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
